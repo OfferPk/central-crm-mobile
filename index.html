@@ -51,6 +51,12 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);ba
 .empty{text-align:center;color:var(--muted);padding:40px 20px}
 footer{position:fixed;bottom:0;left:0;right:0;background:rgba(11,18,32,.95);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));font-size:11px;color:var(--muted);text-align:center}
 .src{font-size:12px;color:var(--muted);padding:8px 0;border-bottom:1px dashed var(--line)}
+.drive{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:8px}
+.drive .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.drive .badge{font-size:11px;padding:3px 8px;border-radius:999px;background:#1d2a44;color:var(--muted)}
+.drive .badge.on{background:#1d3b2a;color:var(--good)}
+.drive .badge.full{background:#3b1d24;color:var(--bad)}
+.drive .badge.ready{background:#1a2740;color:var(--text)}
 details summary{color:var(--muted);font-size:13px;cursor:pointer;margin-top:8px}
 @media(min-width:900px){body{max-width:980px;margin:0 auto}}
 </style>
@@ -68,6 +74,7 @@ details summary{color:var(--muted);font-size:13px;cursor:pointer;margin-top:8px}
   <div class="row">
     <button class="btn primary" id="btnAdd" type="button">+ Add Google Sheet</button>
     <button class="btn" id="btnSources" type="button">Sources</button>
+    <button class="btn" id="btnStorage" type="button">Storage</button>
     <button class="btn" id="btnExport" type="button">Export JSON</button>
   </div>
 </header>
@@ -97,6 +104,16 @@ details summary{color:var(--muted);font-size:13px;cursor:pointer;margin-top:8px}
   <button class="btn" id="btnCloseSrc" type="button" style="margin-top:8px">Close</button>
 </section>
 
+<section class="panel" id="storagePanel">
+  <strong>Multi-Drive storage</strong>
+  <div class="hint" id="storageHint">Browser sirf cache hai · Real save = Google Drive via CEO BOT · Drive 1 full ho to Drive 2 attach.</div>
+  <div id="storageActive" class="hint" style="margin-top:8px"></div>
+  <div id="storageList"></div>
+  <div class="row" style="margin-top:10px">
+    <button class="btn" id="btnCloseStorage" type="button">Close</button>
+  </div>
+</section>
+
 <div class="searchwrap"><input id="q" type="search" placeholder="Search company, city, phone, email…" autocomplete="off"/></div>
 <div class="filters" id="filters"></div>
 <div class="stats" id="stats"></div>
@@ -105,7 +122,9 @@ details summary{color:var(--muted);font-size:13px;cursor:pointer;margin-top:8px}
 
 <script>
 const STORE_KEY='central_crm_v3';
-let BASE=null, EXTRA={sources:[],leads:[]}, SET='all', FILTER='all', Q='';
+const ACTIVE_DRIVE_KEY='central_crm_active_drive_label';
+let BASE=null, EXTRA={sources:[],leads:[]}, SET='all', FILTER='all', Q='', STORAGE=null;
+
 const $=s=>document.querySelector(s);
 function showMsg(el,type,text){ el.className='msg '+type; el.textContent=text; }
 function sheetIdFromUrl(url){ const m=String(url||'').match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/); return m?m[1]:null; }
@@ -241,6 +260,50 @@ function render(){
   $('#foot').textContent=`Drive ${nC} · Sheets ${nS} · Agency ${nA} · Device sources ${EXTRA.sources.length}`;
   $('#subtitle').textContent=`Updated ${BASE.generated_at||''} · Paste sheet links (do not use Drive Select)`;
 }
+function statusBadge(st){
+  const s=String(st||'');
+  if(s==='active') return '<span class="badge on">active</span>';
+  if(s==='full') return '<span class="badge full">full</span>';
+  return '<span class="badge ready">slot_ready</span>';
+}
+async function loadStorage(){
+  try{
+    STORAGE=await (await fetch('data/storage-drives.json?ts='+Date.now())).json();
+  }catch(e){ STORAGE=null; }
+}
+function renderStorage(){
+  const box=$('#storageList');
+  const actEl=$('#storageActive');
+  if(!STORAGE||!Array.isArray(STORAGE.drives)){
+    box.innerHTML='<div class="hint">storage-drives.json load nahi hua</div>';
+    actEl.textContent='';
+    return;
+  }
+  const override=localStorage.getItem(ACTIVE_DRIVE_KEY)||'';
+  const activeId=STORAGE.active_drive_id;
+  const active=(STORAGE.drives||[]).find(d=>d.id===activeId);
+  const label=override||(active&&active.label)||activeId||'—';
+  actEl.innerHTML=`Active: <b>${esc(label)}</b> <span class="meta">(${esc(activeId||'—')})</span>`+
+    (active&&active.folder_url?` · <a href="${esc(active.folder_url)}" target="_blank" rel="noopener">Open Drive</a>`:'')+
+    (active&&active.owner_email?` · ${esc(active.owner_email)}`:'');
+  box.innerHTML=STORAGE.drives.map(d=>{
+    const cap=d.capacity_tb!=null?(d.capacity_tb+' TB'):'—';
+    const isActive=d.id===activeId;
+    const folder=d.folder_id?`<div class="meta">folder: ${esc(d.folder_id)}</div>`:'<div class="meta">folder: not attached yet</div>';
+    const subs=d.subfolders?`<div class="meta">Backups / Database / Exports ready</div>`:'';
+    return `<div class="drive">
+      <div class="top">
+        <div><b>${esc(d.label||d.id)}</b> <span class="meta">${esc(d.role||'')}</span></div>
+        ${statusBadge(d.status)}${isActive?' <span class="badge on">writing here</span>':''}
+      </div>
+      <div class="meta" style="margin-top:6px">Capacity: ${esc(cap)} · ${esc(d.connection||'no connection')}</div>
+      ${folder}${subs}
+      ${d.notes?`<div class="meta" style="margin-top:4px">${esc(d.notes)}</div>`:''}
+    </div>`;
+  }).join('');
+  // remember displayed active label for override UX
+  if(active&&active.label&&!override){ /* leave empty until user sets */ }
+}
 function renderSources(){
   const all=[...EXTRA.sources.map(s=>({...s,origin:'device'})), ...(BASE.sources||[]).map(s=>({...s,origin:'repo'}))];
   const box=$('#srcList');
@@ -288,14 +351,21 @@ async function boot(){
   loadExtra();
   BASE=await (await fetch('data/leads.json?ts='+Date.now())).json();
   try{ const src=await (await fetch('data/sources.json?ts='+Date.now())).json(); BASE.sources=src.sheets||[]; }catch(e){}
+  await loadStorage();
+  if(STORAGE&&STORAGE.active_drive_id){
+    const ad=(STORAGE.drives||[]).find(d=>d.id===STORAGE.active_drive_id);
+    if(ad&&ad.label){ /* keep override if set */ }
+  }
   document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
     SET=t.dataset.set; document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t)); FILTER='all'; buildFilters(); render();
   });
   $('#q').oninput=e=>{ Q=e.target.value.trim().toLowerCase(); render(); };
-  $('#btnAdd').onclick=()=>{ $('#addPanel').classList.add('open'); $('#srcPanel').classList.remove('open'); };
+  $('#btnAdd').onclick=()=>{ $('#addPanel').classList.add('open'); $('#srcPanel').classList.remove('open'); $('#storagePanel').classList.remove('open'); };
   $('#btnCloseAdd').onclick=()=>$('#addPanel').classList.remove('open');
-  $('#btnSources').onclick=()=>{ renderSources(); $('#srcPanel').classList.add('open'); $('#addPanel').classList.remove('open'); };
+  $('#btnSources').onclick=()=>{ renderSources(); $('#srcPanel').classList.add('open'); $('#addPanel').classList.remove('open'); $('#storagePanel').classList.remove('open'); };
   $('#btnCloseSrc').onclick=()=>$('#srcPanel').classList.remove('open');
+  $('#btnStorage').onclick=async()=>{ await loadStorage(); renderStorage(); $('#storagePanel').classList.add('open'); $('#addPanel').classList.remove('open'); $('#srcPanel').classList.remove('open'); };
+  $('#btnCloseStorage').onclick=()=>$('#storagePanel').classList.remove('open');
   $('#btnFetch').onclick=addSheetFromUrl;
   $('#csvFile').onchange=e=>{ const f=e.target.files&&e.target.files[0]; if(f) addSheetFromFile(f); };
   $('#btnExport').onclick=()=>{

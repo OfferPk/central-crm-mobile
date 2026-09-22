@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "updated_at": "2026-09-22T20:19:44+05:00",
+  "active_drive_id": "drive-1",
+  "failover": "when_primary_full_or_write_fails",
+  "drives": [
+    {
+      "id": "drive-1",
+      "label": "Primary 15TB",
+      "status": "active",
+      "role": "primary",
+      "provider": "google_drive",
+      "connection": "user-Google-drive",
+      "folder_id": "1u-feEajnXiJlVHothNeKatPW_JRC356D",
+      "folder_url": "https://drive.google.com/drive/folders/1u-feEajnXiJlVHothNeKatPW_JRC356D",
+      "capacity_tb": 15,
+      "notes": "Owner Google account Drive · darkshadowwon@gmail.com · Central CRM root (LIVE)",
+      "owner_email": "darkshadowwon@gmail.com",
+      "subfolders": {
+        "Backups": "184HqMdqQaybxRBaE_me-zgoZscO5_oQo",
+        "Database": "1K3ZujxrLlzZyYCau86Ln0a59L_cg5A-8",
+        "Exports": "1iBTTskVDQwthSLYG-a9ULfpKbOSp5nc_"
+      },
+      "files": {
+        "Backups/agency-leads.json": "18oSR6yNbrPnPQ1RZJK7ym8BfAHAsuTGn",
+        "Backups/sources.json": "",
+        "Database/leads-mirror.json": ""
+      }
+    },
+    {
+      "id": "drive-2",
+      "label": "Spillover Drive 2",
+      "status": "slot_ready",
+      "role": "spillover",
+      "provider": "google_drive",
+      "connection": "",
+      "folder_id": "",
+      "folder_url": "",
+      "capacity_tb": null,
+      "notes": "Attach when Drive 1 nears full — second Google account via Grok Bot Drive connector"
+    },
+    {
+      "id": "drive-3",
+      "label": "Spillover Drive 3",
+      "status": "slot_ready",
+      "role": "spillover",
+      "provider": "google_drive",
+      "connection": "",
+      "folder_id": "",
+      "folder_url": "",
+      "capacity_tb": null,
+      "notes": "Third Drive slot"
+    }
+  ],
+  "write_targets": [
+    "Backups/agency-leads.json",
+    "Backups/sources.json",
+    "Database/leads-mirror.json"
+  ],
+  "how_to_attach_next": "In Grok Bot: connect another Google Drive account (or ask CEO BOT). Then set folder_id + connection on next slot_ready drive and flip active_drive_id."
+}
