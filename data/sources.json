@@ -1,0 +1,28 @@
+{
+  "updated_at": "2026-09-22T20:03:37+05:00",
+  "drive_folder": "https://drive.google.com/drive/folders/1BNBIOi--KxiUqjADdRdY4FYvGot1Hr5F",
+  "notes": "Each Google Sheet must be Share \u2192 Anyone with the link \u2192 Viewer for auto-fetch.",
+  "sheets": [
+    {
+      "id": "1bu5PqvD1Mc7yffnK9zjhB1ZlFyk7yePOMABb1jZQxEM",
+      "name": "Pakistan ISP Leads",
+      "url": "https://docs.google.com/spreadsheets/d/1bu5PqvD1Mc7yffnK9zjhB1ZlFyk7yePOMABb1jZQxEM/edit",
+      "status": "needs_public_share",
+      "records": 3
+    },
+    {
+      "id": "1JwnYvdAVDfBHccxckMTjCIc7M6e39VXsMEKLqacwuCo",
+      "name": "Enterprise BPO Directory",
+      "url": "https://docs.google.com/spreadsheets/d/1JwnYvdAVDfBHccxckMTjCIc7M6e39VXsMEKLqacwuCo/edit",
+      "status": "needs_public_share",
+      "records": 2
+    },
+    {
+      "id": "1EuSq6321KwAbkGAQjgHDX0e3iwAaUJRMVdqJMKj_Cfs",
+      "name": "Call Center Operations",
+      "url": "https://docs.google.com/spreadsheets/d/1EuSq6321KwAbkGAQjgHDX0e3iwAaUJRMVdqJMKj_Cfs/edit",
+      "status": "needs_public_share",
+      "records": 2
+    }
+  ]
+}

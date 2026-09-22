@@ -1,15 +1,15 @@
-# Central CRM (mobile)
+# Central CRM (mobile + Windows)
 
-Public, mobile-friendly viewer for the **Central CRM** Google Drive folder plus the AI Revenue Agency pipeline snapshot.
+Open: https://offerpk.github.io/central-crm-mobile/
 
-## Open on phone
-1. Open the GitHub Pages URL (after deploy).
-2. Optional: Add to Home Screen for app-like use.
-3. Use **Call / Email / Site** buttons on each card.
+## Add Google Sheet (main goal)
+1. Open the CRM link on phone or Windows.
+2. Tap **+ Add Google Sheet**.
+3. Share your Google Sheet as **Anyone with the link → Viewer**.
+4. Paste the sheet link → **Fetch & save**.
+5. Or upload a **CSV** if the sheet is private.
 
-## Data
-- `data/leads.json` — generated from Drive backups + agency CRM
-- Drive source: https://drive.google.com/drive/folders/1BNBIOi--KxiUqjADdRdY4FYvGot1Hr5F
+Data from added sheets is saved on that device (browser storage). Use **Export JSON** for backup.
 
-## Note
-Drive Central CRM currently syncs a small sample set (~7 leads from 3 Google Sheets). Agency tab shows the live pipeline snapshot (256 leads).
+## Scrapers / multiple emails
+Point each scraper at its own Google Sheet (public viewer link), then add those links in the CRM UI. Same CRM, many sources.

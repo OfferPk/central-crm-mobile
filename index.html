@@ -5,128 +5,311 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <meta name="theme-color" content="#0b1220"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <title>Central CRM</title>
 <link rel="manifest" href="manifest.webmanifest"/>
 <style>
-  :root {
-    --bg:#0b1220; --card:#151d2e; --line:#243049; --text:#eef3ff; --muted:#93a0b8;
-    --accent:#5b8cff; --good:#3dd68c; --warn:#f5a524; --bad:#f07178;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);padding-bottom:88px}
-  header{position:sticky;top:0;z-index:20;background:rgba(11,18,32,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 14px 10px}
-  h1{margin:0;font-size:18px}
-  .sub{color:var(--muted);font-size:12px;margin-top:2px}
-  .tabs{display:flex;gap:8px;margin-top:10px}
-  .tab{flex:1;text-align:center;padding:10px 8px;border-radius:10px;background:#101827;border:1px solid var(--line);color:var(--muted);font-size:13px;font-weight:600}
-  .tab.active{background:#1a2740;color:var(--text);border-color:var(--accent)}
-  .searchwrap{padding:10px 14px;position:sticky;top:96px;z-index:15;background:var(--bg)}
-  input#q{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:16px}
-  .filters{display:flex;gap:8px;overflow-x:auto;padding:0 14px 8px;-webkit-overflow-scrolling:touch}
-  .chip{white-space:nowrap;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted);font-size:12px}
-  .chip.on{background:#1a2740;color:var(--text);border-color:var(--accent)}
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 14px 10px}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
-  .stat .l{font-size:11px;color:var(--muted)}.stat .v{font-size:20px;font-weight:700;margin-top:2px}
-  #list{padding:0 14px;display:grid;gap:10px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
-  .name{font-size:16px;font-weight:700;margin:0 0 4px}
-  .meta{color:var(--muted);font-size:12px;line-height:1.4}
-  .pills{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
-  .pill{font-size:11px;padding:3px 8px;border-radius:999px;background:#1d2a44}
-  .pill.good{background:#1d3b2a;color:var(--good)}
-  .pill.warn{background:#3b2e14;color:var(--warn)}
-  .actions{display:flex;gap:8px;margin-top:10px}
-  .btn{flex:1;text-align:center;text-decoration:none;color:var(--text);background:#1a2740;border:1px solid var(--line);border-radius:10px;padding:11px 8px;font-size:13px;font-weight:600}
-  .btn.call{border-color:#2f6b4f;background:#163328}
-  .btn.mail{border-color:#3a4f7a;background:#18233a}
-  .btn.web{border-color:#4a3f1f;background:#2a2414}
-  .empty{text-align:center;color:var(--muted);padding:40px 20px}
-  footer{position:fixed;bottom:0;left:0;right:0;background:rgba(11,18,32,.95);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));font-size:11px;color:var(--muted);text-align:center}
+:root{--bg:#0b1220;--card:#151d2e;--line:#243049;--text:#eef3ff;--muted:#93a0b8;--accent:#5b8cff;--good:#3dd68c;--warn:#f5a524;--bad:#f07178}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);padding-bottom:96px}
+header{position:sticky;top:0;z-index:30;background:rgba(11,18,32,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 14px}
+h1{margin:0;font-size:18px}
+.sub{color:var(--muted);font-size:12px;margin-top:3px}
+.row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.btn,.tab{border:1px solid var(--line);background:#101827;color:var(--text);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;cursor:pointer}
+.tab{flex:1;text-align:center;color:var(--muted);min-width:88px}
+.tab.active{background:#1a2740;color:var(--text);border-color:var(--accent)}
+.btn.primary{background:#1a3a6b;border-color:var(--accent)}
+.btn.good{background:#163328;border-color:#2f6b4f}
+.panel{display:none;padding:12px 14px;border-bottom:1px solid var(--line);background:#0e1624}
+.panel.open{display:block}
+label{display:block;font-size:12px;color:var(--muted);margin:8px 0 4px}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:16px}
+.hint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.45}
+.msg{margin-top:8px;padding:10px;border-radius:10px;font-size:13px;display:none}
+.msg.ok{display:block;background:#163328;color:var(--good)}
+.msg.err{display:block;background:#3b1d24;color:var(--bad)}
+.msg.info{display:block;background:#1a2740;color:var(--text)}
+.searchwrap{padding:10px 14px}
+#q{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:16px}
+.filters{display:flex;gap:8px;overflow-x:auto;padding:0 14px 8px}
+.chip{white-space:nowrap;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted);font-size:12px}
+.chip.on{background:#1a2740;color:var(--text);border-color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 14px 10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
+.stat .l{font-size:11px;color:var(--muted)}.stat .v{font-size:20px;font-weight:700;margin-top:2px}
+#list{padding:0 14px;display:grid;gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.name{font-size:16px;font-weight:700;margin:0 0 4px}
+.meta{color:var(--muted);font-size:12px;line-height:1.4}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.pill{font-size:11px;padding:3px 8px;border-radius:999px;background:#1d2a44}
+.pill.good{background:#1d3b2a;color:var(--good)}
+.actions{display:flex;gap:8px;margin-top:10px}
+.actions a{flex:1;text-align:center;text-decoration:none;color:var(--text);background:#1a2740;border:1px solid var(--line);border-radius:10px;padding:11px 8px;font-size:13px;font-weight:600}
+.actions a.call{border-color:#2f6b4f;background:#163328}
+.actions a.mail{border-color:#3a4f7a;background:#18233a}
+.empty{text-align:center;color:var(--muted);padding:40px 20px}
+footer{position:fixed;bottom:0;left:0;right:0;background:rgba(11,18,32,.95);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));font-size:11px;color:var(--muted);text-align:center}
+.src{font-size:12px;color:var(--muted);padding:8px 0;border-bottom:1px dashed var(--line)}
+@media(min-width:900px){body{max-width:980px;margin:0 auto}}
 </style>
 </head>
 <body>
 <header>
   <h1>Central CRM</h1>
   <div class="sub" id="subtitle">Loading…</div>
-  <div class="tabs">
-    <button class="tab active" data-set="central" type="button">Central (Drive)</button>
-    <button class="tab" data-set="agency" type="button">Agency pipeline</button>
+  <div class="row">
+    <button class="tab active" data-set="all" type="button">All</button>
+    <button class="tab" data-set="central" type="button">Drive</button>
+    <button class="tab" data-set="sheets" type="button">Sheets</button>
+    <button class="tab" data-set="agency" type="button">Agency</button>
+  </div>
+  <div class="row">
+    <button class="btn primary" id="btnAdd" type="button">+ Add Google Sheet</button>
+    <button class="btn" id="btnSources" type="button">Sources</button>
+    <button class="btn" id="btnExport" type="button">Export JSON</button>
   </div>
 </header>
-<div class="searchwrap"><input id="q" type="search" placeholder="Search company, city, phone, email…" enterkeyhint="search" autocomplete="off"/></div>
+
+<section class="panel" id="addPanel">
+  <strong>Add Google Sheet / CSV</strong>
+  <div class="hint">Scrapers ki sheet yahan connect karo. Pehle Share → <b>Anyone with the link → Viewer</b>. Private ho to CSV upload use karo.</div>
+  <label>Name (optional)</label>
+  <input id="sheetName" placeholder="e.g. Lahore BPO scrape"/>
+  <label>Public Google Sheet link</label>
+  <input id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/..../edit"/>
+  <label>Or upload CSV</label>
+  <input id="csvFile" type="file" accept=".csv,text/csv"/>
+  <div class="row" style="margin-top:10px">
+    <button class="btn good" id="btnFetch" type="button">Fetch &amp; save</button>
+    <button class="btn" id="btnCloseAdd" type="button">Close</button>
+  </div>
+  <div class="msg" id="addMsg"></div>
+</section>
+
+<section class="panel" id="srcPanel">
+  <strong>Registered sources</strong>
+  <div id="srcList" class="hint">None yet</div>
+  <div class="hint" style="margin-top:10px">Device pe save localStorage mein hota hai. Public sheets ko baad mein central sync bhi kar sakte hain.</div>
+  <button class="btn" id="btnCloseSrc" type="button" style="margin-top:8px">Close</button>
+</section>
+
+<div class="searchwrap"><input id="q" type="search" placeholder="Search company, city, phone, email…" autocomplete="off"/></div>
 <div class="filters" id="filters"></div>
 <div class="stats" id="stats"></div>
 <div id="list"></div>
-<footer id="foot">Mobile-friendly · GitHub Pages</footer>
+<footer id="foot">Central CRM · mobile + Windows</footer>
+
 <script>
-let DATA=null, SET='central', FILTER='all', Q='';
+const STORE_KEY='central_crm_v2';
+let BASE=null, EXTRA={sources:[], leads:[]}, SET='all', FILTER='all', Q='';
 const $=s=>document.querySelector(s);
-async function boot(){
-  DATA=await (await fetch('data/leads.json')).json();
-  $('#subtitle').textContent = `Updated ${DATA.generated_at} · Central ${DATA.counts.central} · Agency ${DATA.counts.agency}`;
-  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{SET=t.dataset.set;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));FILTER='all'; buildFilters(); render();});
-  $('#q').oninput=e=>{Q=e.target.value.trim().toLowerCase(); render();};
-  buildFilters(); render();
+function showMsg(el,type,text){ el.className='msg '+type; el.textContent=text; }
+function sheetIdFromUrl(url){ const m=String(url||'').match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/); return m?m[1]:null; }
+function csvUrls(id){
+  return [
+    `https://docs.google.com/spreadsheets/d/${id}/export?format=csv`,
+    `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=0`,
+    `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv`,
+    `https://docs.google.com/spreadsheets/d/${id}/pub?output=csv`
+  ];
 }
-function leads(){ return SET==='central' ? (DATA.central_leads||[]) : (DATA.agency_leads||[]); }
+function parseCSV(text){
+  const rows=[]; let row=[], cell='', i=0, q=false;
+  text=String(text||'').replace(/^\uFEFF/,'');
+  while(i<text.length){
+    const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){ cell+='"'; i+=2; continue;} q=false; i++; continue;} cell+=c; i++; continue; }
+    if(c==='"'){ q=true; i++; continue; }
+    if(c===','){ row.push(cell); cell=''; i++; continue; }
+    if(c==='\n'){ row.push(cell); rows.push(row); row=[]; cell=''; i++; continue; }
+    if(c==='\r'){ i++; continue; }
+    cell+=c; i++;
+  }
+  if(cell.length||row.length){ row.push(cell); rows.push(row); }
+  return rows.filter(r=>r.some(x=>String(x).trim()!==''));
+}
+function normKey(k){ return String(k||'').trim().toLowerCase().replace(/\s+/g,'_'); }
+function rowsToLeads(rows, meta){
+  if(!rows.length) return [];
+  const headers=rows[0].map(normKey);
+  const pick=(obj,names)=>{ for(const n of names){ if(obj[n]) return obj[n]; } return ''; };
+  const out=[];
+  for(const r of rows.slice(1)){
+    const obj={}; headers.forEach((h,idx)=>obj[h]=(r[idx]||'').trim());
+    const company=pick(obj,['company','company_name','business','business_name','name','bpo','firm','organization']);
+    if(!company) continue;
+    out.push({
+      id: meta.id+':'+ (out.length+1),
+      source_id: meta.id,
+      company,
+      contact: pick(obj,['contact','contact_person','person','owner']),
+      phone: pick(obj,['phone','mobile','whatsapp','contact_number','phone_number']),
+      email: pick(obj,['email','e-mail','mail']),
+      website: pick(obj,['website','url','site','web']),
+      city: pick(obj,['city','location','area','address']),
+      country: pick(obj,['country']) || 'Pakistan',
+      category: pick(obj,['category','category_name','type','industry','segment']) || meta.name || 'Sheet',
+      status: pick(obj,['status','lead_status','stage']) || 'Imported',
+      notes: pick(obj,['notes','note','remarks','comment']),
+      source: meta.name || meta.url,
+      imported_at: new Date().toISOString()
+    });
+  }
+  return out;
+}
+async function fetchSheetCSV(id){
+  let lastErr;
+  for(const url of csvUrls(id)){
+    try{
+      const res=await fetch(url,{mode:'cors'});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const text=await res.text();
+      const low=text.toLowerCase();
+      if(low.includes('<html')||low.includes('sign in')||low.includes('<!doctype')) throw new Error('Sheet not public');
+      return text;
+    }catch(e){ lastErr=e; }
+  }
+  throw lastErr||new Error('Fetch failed');
+}
+function loadExtra(){
+  try{ EXTRA=JSON.parse(localStorage.getItem(STORE_KEY)||'{"sources":[],"leads":[]}'); }catch(e){ EXTRA={sources:[],leads:[]}; }
+  if(!Array.isArray(EXTRA.sources)) EXTRA.sources=[];
+  if(!Array.isArray(EXTRA.leads)) EXTRA.leads=[];
+}
+function saveExtra(){ localStorage.setItem(STORE_KEY, JSON.stringify(EXTRA)); }
+function allLeads(){
+  const central=(BASE.central_leads||[]).map(L=>({...L,_bucket:'central'}));
+  const agency=(BASE.agency_leads||[]).map(L=>({...L,_bucket:'agency'}));
+  const sheets=[...(BASE.sheet_leads||[]), ...EXTRA.leads].map(L=>({...L,_bucket:'sheets'}));
+  if(SET==='central') return central;
+  if(SET==='agency') return agency;
+  if(SET==='sheets') return sheets;
+  return [...sheets,...central,...agency];
+}
 function buildFilters(){
   const vals=new Set();
-  leads().forEach(L=>{ const v=(L.category||L.status||'').trim(); if(v) vals.add(v); });
+  allLeads().forEach(L=>{ const v=(L.category||L.status||'').trim(); if(v) vals.add(v); });
   const box=$('#filters'); box.innerHTML='';
-  const all=document.createElement('button'); all.className='chip on'; all.textContent='All'; all.onclick=()=>{FILTER='all'; [...box.children].forEach(c=>c.classList.remove('on')); all.classList.add('on'); render();};
-  box.appendChild(all);
-  [...vals].sort().forEach(v=>{
-    const b=document.createElement('button'); b.className='chip'; b.textContent=v;
-    b.onclick=()=>{FILTER=v; [...box.children].forEach(c=>c.classList.remove('on')); b.classList.add('on'); render();};
+  const mk=(label,val,on)=>{
+    const b=document.createElement('button'); b.type='button'; b.className='chip'+(on?' on':''); b.textContent=label;
+    b.onclick=()=>{ FILTER=val; [...box.children].forEach(c=>c.classList.remove('on')); b.classList.add('on'); render(); };
     box.appendChild(b);
-  });
+  };
+  mk('All','all',FILTER==='all');
+  [...vals].sort().slice(0,24).forEach(v=>mk(v,v,FILTER===v));
 }
 function phoneHref(p){ if(!p) return null; const n=String(p).replace(/[^\d+]/g,''); return n?`tel:${n}`:null; }
+function esc(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
 function render(){
-  let rows=leads().filter(L=>{
-    if(FILTER!=='all'){
-      const hit=(L.category||'')===FILTER || (L.status||'')===FILTER; if(!hit) return false;
-    }
+  let rows=allLeads().filter(L=>{
+    if(FILTER!=='all' && (L.category||'')!==FILTER && (L.status||'')!==FILTER) return false;
     if(!Q) return true;
-    const blob=[L.company,L.contact,L.phone,L.email,L.city,L.category,L.status,L.notes,L.website].join(' ').toLowerCase();
+    const blob=[L.company,L.contact,L.phone,L.email,L.city,L.category,L.status,L.notes,L.website,L.source].join(' ').toLowerCase();
     return blob.includes(Q);
   });
-  const withPhone=rows.filter(L=>L.phone).length, withEmail=rows.filter(L=>L.email).length;
   $('#stats').innerHTML=`
     <div class="stat"><div class="l">Showing</div><div class="v">${rows.length}</div></div>
-    <div class="stat"><div class="l">With phone</div><div class="v">${withPhone}</div></div>
-    <div class="stat"><div class="l">With email</div><div class="v">${withEmail}</div></div>`;
+    <div class="stat"><div class="l">With phone</div><div class="v">${rows.filter(L=>L.phone).length}</div></div>
+    <div class="stat"><div class="l">With email</div><div class="v">${rows.filter(L=>L.email).length}</div></div>`;
   const list=$('#list'); list.innerHTML='';
-  if(!rows.length){ list.innerHTML='<div class="empty">No matches</div>'; return; }
-  rows.forEach(L=>{
+  if(!rows.length){ list.innerHTML='<div class="empty">No matches. Add a public Google Sheet or switch tab.</div>'; return; }
+  rows.slice(0,500).forEach(L=>{
     const el=document.createElement('article'); el.className='card';
     const tel=phoneHref(L.phone);
-    const mail=L.email?`mailto:${L.email}`:null;
+    const mail=L.email?`mailto:${encodeURIComponent(L.email)}`:null;
     const web=L.website?(L.website.startsWith('http')?L.website:'https://'+L.website):null;
     el.innerHTML=`
       <h2 class="name">${esc(L.company||'Untitled')}</h2>
-      <div class="meta">${esc([L.city,L.country].filter(Boolean).join(' · '))}${L.contact? ' · '+esc(L.contact):''}</div>
+      <div class="meta">${esc([L.city,L.country].filter(Boolean).join(' · '))}${L.contact?' · '+esc(L.contact):''}</div>
       <div class="pills">
+        ${L._bucket?`<span class="pill">${esc(L._bucket)}</span>`:''}
         ${L.category?`<span class="pill">${esc(L.category)}</span>`:''}
         ${L.status?`<span class="pill good">${esc(L.status)}</span>`:''}
-        ${L.temp?`<span class="pill warn">${esc(L.temp)}</span>`:''}
-        ${L.outreach?`<span class="pill">${esc(L.outreach)}</span>`:''}
       </div>
       <div class="meta">${L.phone?esc(L.phone):'No phone'} · ${L.email?esc(L.email):'No email'}</div>
+      ${L.source?`<div class="meta">Source: ${esc(L.source)}</div>`:''}
       ${L.notes?`<div class="meta" style="margin-top:6px">${esc(L.notes)}</div>`:''}
       <div class="actions">
-        ${tel?`<a class="btn call" href="${tel}">Call</a>`:''}
-        ${mail?`<a class="btn mail" href="${mail}">Email</a>`:''}
-        ${web?`<a class="btn web" href="${web}" target="_blank" rel="noopener">Site</a>`:''}
+        ${tel?`<a class="call" href="${tel}">Call</a>`:''}
+        ${mail?`<a class="mail" href="${mail}">Email</a>`:''}
+        ${web?`<a href="${web}" target="_blank" rel="noopener">Site</a>`:''}
       </div>`;
     list.appendChild(el);
   });
-  $('#foot').textContent=`Central CRM mobile · ${DATA.counts.central} Drive leads · ${DATA.counts.agency} agency leads`;
+  const nC=(BASE.central_leads||[]).length, nA=(BASE.agency_leads||[]).length, nS=(BASE.sheet_leads||[]).length+EXTRA.leads.length;
+  $('#foot').textContent=`Drive ${nC} · Sheets ${nS} · Agency ${nA} · Device sources ${EXTRA.sources.length}`;
+  $('#subtitle').textContent=`Updated ${BASE.generated_at||''} · Added sheets save on this phone/PC`;
 }
-function esc(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
-boot().catch(e=>{ $('#subtitle').textContent='Failed to load data/leads.json'; console.error(e); });
+function renderSources(){
+  const base=(BASE.sources||[]).map(s=>({...s, origin:'repo'}));
+  const local=EXTRA.sources.map(s=>({...s, origin:'device'}));
+  const all=[...local,...base];
+  const box=$('#srcList');
+  if(!all.length){ box.textContent='No sources yet'; return; }
+  box.innerHTML=all.map(s=>`<div class="src"><b>${esc(s.name||s.id||'Sheet')}</b> · ${esc(s.status||s.origin||'')} · ${s.records!=null? (s.records+' rows · '):''}<a href="${esc(s.url||'#')}" target="_blank" rel="noopener">open</a></div>`).join('');
+}
+async function addSheetFromUrl(){
+  const url=$('#sheetUrl').value.trim();
+  const name=$('#sheetName').value.trim() || 'Imported sheet';
+  const msg=$('#addMsg');
+  const id=sheetIdFromUrl(url);
+  if(!id){ showMsg(msg,'err','Valid Google Sheet link chahiye'); return; }
+  showMsg(msg,'info','Fetching sheet…');
+  try{
+    const text=await fetchSheetCSV(id);
+    const leads=rowsToLeads(parseCSV(text), {id,name,url});
+    if(!leads.length){ showMsg(msg,'err','Rows nahi mili. Header mein Company/Name column rakho.'); return; }
+    EXTRA.sources=EXTRA.sources.filter(s=>s.id!==id);
+    EXTRA.sources.unshift({id,name,url,status:'ok',records:leads.length,added_at:new Date().toISOString()});
+    EXTRA.leads=EXTRA.leads.filter(L=>L.source_id!==id).concat(leads);
+    saveExtra(); SET='sheets';
+    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.set==='sheets'));
+    buildFilters(); render(); renderSources();
+    showMsg(msg,'ok', leads.length+' leads import + is device pe save ho gayi.');
+  }catch(e){
+    showMsg(msg,'err', 'Fetch fail: '+(e.message||e)+'. Sheet ko Anyone-with-link Viewer banao, ya CSV upload karo.');
+  }
+}
+async function addSheetFromFile(file){
+  const msg=$('#addMsg');
+  showMsg(msg,'info','Reading CSV…');
+  const text=await file.text();
+  const id='csv_'+Date.now();
+  const name=$('#sheetName').value.trim() || file.name || 'CSV upload';
+  const leads=rowsToLeads(parseCSV(text), {id,name,url:file.name});
+  if(!leads.length){ showMsg(msg,'err','CSV parse fail / company column missing'); return; }
+  EXTRA.sources.unshift({id,name,url:file.name,status:'csv_upload',records:leads.length,added_at:new Date().toISOString()});
+  EXTRA.leads=EXTRA.leads.concat(leads);
+  saveExtra(); SET='sheets';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.set==='sheets'));
+  buildFilters(); render(); renderSources();
+  showMsg(msg,'ok', leads.length+' leads CSV se save ho gayi.');
+}
+async function boot(){
+  loadExtra();
+  BASE=await (await fetch('data/leads.json?ts='+Date.now())).json();
+  try{
+    const src=await (await fetch('data/sources.json?ts='+Date.now())).json();
+    BASE.sources=src.sheets||BASE.sources||[];
+  }catch(e){}
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+    SET=t.dataset.set; document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t)); FILTER='all'; buildFilters(); render();
+  });
+  $('#q').oninput=e=>{ Q=e.target.value.trim().toLowerCase(); render(); };
+  $('#btnAdd').onclick=()=>{ $('#addPanel').classList.add('open'); $('#srcPanel').classList.remove('open'); };
+  $('#btnCloseAdd').onclick=()=>$('#addPanel').classList.remove('open');
+  $('#btnSources').onclick=()=>{ renderSources(); $('#srcPanel').classList.add('open'); $('#addPanel').classList.remove('open'); };
+  $('#btnCloseSrc').onclick=()=>$('#srcPanel').classList.remove('open');
+  $('#btnFetch').onclick=addSheetFromUrl;
+  $('#csvFile').onchange=e=>{ const f=e.target.files&&e.target.files[0]; if(f) addSheetFromFile(f); };
+  $('#btnExport').onclick=()=>{
+    const blob=new Blob([JSON.stringify({exported_at:new Date().toISOString(), sources:EXTRA.sources, leads:EXTRA.leads},null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='central-crm-local.json'; a.click();
+  };
+  buildFilters(); render();
+}
+boot().catch(e=>{ $('#subtitle').textContent='Failed to load CRM data'; console.error(e); });
 </script>
 </body>
 </html>
