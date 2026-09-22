@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-22T20:19:44+05:00",
+  "updated_at": "2026-09-22T20:21:59+05:00",
   "active_drive_id": "drive-1",
   "failover": "when_primary_full_or_write_fails",
   "drives": [
@@ -23,8 +23,9 @@
       },
       "files": {
         "Backups/agency-leads.json": "18oSR6yNbrPnPQ1RZJK7ym8BfAHAsuTGn",
-        "Backups/sources.json": "",
-        "Database/leads-mirror.json": ""
+        "Backups/sources.json": "17k_NOMtJHrrgmVDUn32Ty9f-EJiG6jyE",
+        "Database/leads-mirror.json": "10qLCborJpge-jbaxoEvoQ0qRytjKPjr7",
+        "Database/Central CRM Soft Index": "1Y8A4vyb7KPp7TY6G0RQ5BMKuifdwaDSGprwPgx5yhVY"
       }
     },
     {
@@ -57,5 +58,5 @@
     "Backups/sources.json",
     "Database/leads-mirror.json"
   ],
-  "how_to_attach_next": "In Grok Bot: connect another Google Drive account (or ask CEO BOT). Then set folder_id + connection on next slot_ready drive and flip active_drive_id."
+  "how_to_attach_next": "Bolo mujhe: Drive 2 attach karo. Main dusra Google account connect karunga, naya Central CRM folder banunga, drive-2 pe folder_id + connection set karke active_drive_id flip kar dunga."
 }
