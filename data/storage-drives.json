@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-22T20:21:59+05:00",
+  "updated_at": "2026-09-22T20:37:20+05:00",
   "active_drive_id": "drive-1",
   "failover": "when_primary_full_or_write_fails",
   "drives": [
@@ -31,14 +31,27 @@
     {
       "id": "drive-2",
       "label": "Spillover Drive 2",
-      "status": "slot_ready",
+      "status": "ready_spillover",
       "role": "spillover",
       "provider": "google_drive",
-      "connection": "",
+      "connection": "user-Google-drive--drive2",
       "folder_id": "",
       "folder_url": "",
-      "capacity_tb": null,
-      "notes": "Attach when Drive 1 nears full — second Google account via Grok Bot Drive connector"
+      "capacity_tb": 15,
+      "notes": "ARMED spillover · Kingofheck105@gmail.com · connection user-Google-drive--drive2. auto_failover=true: writes spill here when drive-1 is full or write fails. BLOCKER 2026-09-22: create_file/CallMcpTool returns 'MCP server does not exist' even though GetMcpTools lists server ready — Central CRM folder tree NOT created. Seed files uploaded to My Drive ROOT (move into Backups/Database after folders exist).",
+      "owner_email": "Kingofheck105@gmail.com",
+      "files": {
+        "MyDrive/agency-leads.json": "1SadExEzRzceydS8efrSgy3xpMlHUl_CH",
+        "MyDrive/sources.json": "1mfQevvMW2OpVnICpQrY5SLANPMDMnkV9",
+        "MyDrive/leads-mirror.json": "1zfmU8UkJe_5WihHSDHAj7QKPovPOGHXN",
+        "MyDrive/agency-leads.json (earlier probe)": "1yWqQZtmLMnJqflrJQnC4OQ_FN4TJhaCl",
+        "MyDrive/sources-probe-root.json": "1Ypuz6v5sHqK-pXvHRsQPleEVpZ5W7zTK"
+      },
+      "subfolders": {
+        "Backups": "",
+        "Database": "",
+        "Exports": ""
+      }
     },
     {
       "id": "drive-3",
@@ -58,5 +71,6 @@
     "Backups/sources.json",
     "Database/leads-mirror.json"
   ],
-  "how_to_attach_next": "Bolo mujhe: Drive 2 attach karo. Main dusra Google account connect karunga, naya Central CRM folder banunga, drive-2 pe folder_id + connection set karke active_drive_id flip kar dunga."
+  "how_to_attach_next": "Drive 2 (Kingofheck105@gmail.com) is armed for spillover: connection live, seed files on My Drive root. CREATE folder tree Central CRM/{Backups,Database,Exports} via create_file on user-Google-drive--drive2 once CallMcpTool/CallDynamicTool works (GetMcpTools sees server ready but invocation returns 'MCP server does not exist'). Then set folder_id + subfolders and move root seed files into Backups/Database.",
+  "auto_failover": true
 }
