@@ -81,7 +81,7 @@ details summary{color:var(--muted);font-size:13px;cursor:pointer;margin-top:8px}
 
 <section class="panel" id="addPanel">
   <strong>Add Google Sheet (paste link)</strong>
-  <div class="hint"><b>Mobile:</b> Drive “Select” mat dabao — woh grey rahega. Sheet open karo → Share → <b>Anyone with the link → Viewer</b> → link copy → yahan <b>paste</b>.</div>
+  <div class="hint"><b>Koi bhi columns OK</b> (Name/Company zaroori nahi) — CRM headers sheet se khud banaega, extra fields invent nahi karega. Sheet ko <b>Anyone with the link → Viewer</b> share karke link paste karo. Drive Select grey rehna normal hai.</div>
   <label>Name (optional)</label>
   <input id="sheetName" placeholder="e.g. Dubai Fabric & Textile Leads"/>
   <label>Google Sheet link (paste here)</label>
@@ -153,43 +153,47 @@ function parseCSV(text){
 }
 function normKey(k){ return String(k||'').trim().toLowerCase().replace(/\s+/g,'_'); }
 function rowsToLeads(rows, meta){
-  if(!rows.length) return [];
-  const headers=rows[0].map(normKey);
+  /* Any sheet: keep every column as-is. No required Company/Name.
+     Do not invent country/status/category — only copy what the sheet has. */
+  if(!rows || rows.length<2) return [];
+  const rawHeaders=rows[0].map(h=>String(h||'').trim());
+  const headers=rawHeaders.map((h,i)=>normKey(h)||('col_'+(i+1)));
   const pick=(obj,names)=>{ for(const n of names){ if(obj[n]) return obj[n]; } return ''; };
   const out=[];
-  for(const r of rows.slice(1)){
-    const obj={}; headers.forEach((h,idx)=>obj[h]=(r[idx]||'').trim());
-    const company=pick(obj,['company','company_name','business','business_name','name','bpo','firm','organization','lead','title']);
-    if(!company) continue;
+  for(let ri=1; ri<rows.length; ri++){
+    const r=rows[ri];
+    if(!r || !r.some(x=>String(x||'').trim()!=='')) continue;
+    const fields={};
+    const obj={};
+    headers.forEach((h,idx)=>{
+      const label=rawHeaders[idx]||h;
+      const val=String((r[idx]!=null?r[idx]:'')||'').trim();
+      if(val!==''){ fields[label]=val; obj[h]=val; }
+    });
+    if(!Object.keys(fields).length) continue;
+    // Display title = first non-empty cell (whatever column), not forced Name/Company
+    const title = Object.values(fields)[0] || ('Row '+ri);
+    const knownCompany=pick(obj,['company','company_name','business','business_name','name','bpo','firm','organization','lead','title','client','brand']);
     out.push({
-      id: meta.id+':'+(out.length+1), source_id: meta.id, company,
-      contact: pick(obj,['contact','contact_person','person','owner']),
-      phone: pick(obj,['phone','mobile','whatsapp','contact_number','phone_number']),
-      email: pick(obj,['email','e-mail','mail']),
+      id: meta.id+':'+ri,
+      source_id: meta.id,
+      company: knownCompany || title,
+      contact: pick(obj,['contact','contact_person','person','owner','contact_name']),
+      phone: pick(obj,['phone','mobile','whatsapp','contact_number','phone_number','tel','cell']),
+      email: pick(obj,['email','e-mail','mail','e_mail']),
       website: pick(obj,['website','url','site','web']),
-      city: pick(obj,['city','location','area','address']),
-      country: pick(obj,['country'])||'Pakistan',
-      category: pick(obj,['category','category_name','type','industry','segment'])||meta.name||'Sheet',
-      status: pick(obj,['status','lead_status','stage'])||'Imported',
+      city: pick(obj,['city','location','area','address','town']),
+      country: pick(obj,['country']),
+      category: pick(obj,['category','category_name','type','industry','segment']),
+      status: pick(obj,['status','lead_status','stage']),
       notes: pick(obj,['notes','note','remarks','comment']),
-      source: meta.name||meta.url, imported_at: new Date().toISOString()
+      source: meta.name||meta.url||'',
+      columns: headers.slice(),
+      fields,
+      imported_at: new Date().toISOString()
     });
   }
   return out;
-}
-async function fetchSheetCSV(id){
-  let lastErr;
-  for(const url of csvUrls(id)){
-    try{
-      const res=await fetch(url,{mode:'cors'});
-      if(!res.ok) throw new Error('HTTP '+res.status);
-      const text=await res.text();
-      const low=text.toLowerCase();
-      if(low.includes('<html')||low.includes('sign in')||low.includes('<!doctype')) throw new Error('Sheet not public');
-      return text;
-    }catch(e){ lastErr=e; }
-  }
-  throw lastErr||new Error('Fetch failed');
 }
 function loadExtra(){
   try{ EXTRA=JSON.parse(localStorage.getItem(STORE_KEY)||'{"sources":[],"leads":[]}'); }catch(e){ EXTRA={sources:[],leads:[]}; }
@@ -224,7 +228,7 @@ function render(){
   let rows=allLeads().filter(L=>{
     if(FILTER!=='all' && (L.category||'')!==FILTER && (L.status||'')!==FILTER) return false;
     if(!Q) return true;
-    const blob=[L.company,L.contact,L.phone,L.email,L.city,L.category,L.status,L.notes,L.website,L.source].join(' ').toLowerCase();
+    const extra=L.fields?Object.values(L.fields).join(' '):''; const blob=[L.company,L.contact,L.phone,L.email,L.city,L.category,L.status,L.notes,L.website,L.source,extra].join(' ').toLowerCase();
     return blob.includes(Q);
   });
   $('#stats').innerHTML=`
@@ -249,6 +253,7 @@ function render(){
       <div class="meta">${L.phone?esc(L.phone):'No phone'} · ${L.email?esc(L.email):'No email'}</div>
       ${L.source?`<div class="meta">Source: ${esc(L.source)}</div>`:''}
       ${L.notes?`<div class="meta" style="margin-top:6px">${esc(L.notes)}</div>`:''}
+      ${L.fields?`<div class="meta" style="margin-top:6px">${Object.entries(L.fields).map(([k,v])=>`<div><b>${esc(k)}</b>: ${esc(v)}</div>`).join('')}</div>`:''}
       <div class="actions">
         ${tel?`<a class="call" href="${tel}">Call</a>`:''}
         ${mail?`<a class="mail" href="${mail}">Email</a>`:''}
@@ -320,7 +325,7 @@ async function addSheetFromUrl(){
   try{
     const text=await fetchSheetCSV(id);
     const leads=rowsToLeads(parseCSV(text),{id,name,url});
-    if(!leads.length){ showMsg(msg,'err','Rows nahi mili. Header mein Company/Name column rakho.'); return; }
+    if(!leads.length){ showMsg(msg,'err','Sheet khali lagi ya pehli row ke baad koi data row nahi mili. Header + kam az kam 1 data row chahiye (column names kuch bhi ho sakte hain).'); return; }
     EXTRA.sources=EXTRA.sources.filter(s=>s.id!==id);
     EXTRA.sources.unshift({id,name,url,status:'ok',records:leads.length,added_at:new Date().toISOString()});
     EXTRA.leads=EXTRA.leads.filter(L=>L.source_id!==id).concat(leads);
@@ -339,7 +344,7 @@ async function addSheetFromFile(file){
   const id='csv_'+Date.now();
   const name=$('#sheetName').value.trim()||file.name||'CSV upload';
   const leads=rowsToLeads(parseCSV(text),{id,name,url:file.name});
-  if(!leads.length){ showMsg(msg,'err','CSV parse fail / company column missing'); return; }
+  if(!leads.length){ showMsg(msg,'err','CSV khali hai ya data rows nahi mili. Pehli row headers hon, uske baad data — column names free hain.'); return; }
   EXTRA.sources.unshift({id,name,url:file.name,status:'csv_upload',records:leads.length,added_at:new Date().toISOString()});
   EXTRA.leads=EXTRA.leads.concat(leads);
   saveExtra(); SET='sheets';

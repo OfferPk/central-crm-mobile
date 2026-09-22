@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-22T20:12:58+05:00",
-  "title": "Central CRM",
+  "generated_at": "2026-09-22T20:41:03+05:00",
+  "title": "Central CRM — Drive 1+2 synced",
   "drive_folder": "https://drive.google.com/drive/folders/1BNBIOi--KxiUqjADdRdY4FYvGot1Hr5F",
   "sources": [
     {
@@ -3967,7 +3967,197 @@
   "counts": {
     "central": 7,
     "agency": 256,
-    "sheets": 0
+    "sheets": 7,
+    "total": 270
   },
-  "sheet_leads": []
+  "sheet_leads": [
+    {
+      "id": "drive-backup:1",
+      "company": "Alpha ISP Networks",
+      "contact": "",
+      "phone": "+92-51-111222333",
+      "email": "info@alphaisp.com",
+      "website": "",
+      "city": "Islamabad",
+      "country": "",
+      "category": "ISP",
+      "status": "",
+      "notes": "Active fiber ISP with 200 clients",
+      "source": "Drive backup (darkshadowwon)",
+      "fields": {
+        "Company": "Alpha ISP Networks",
+        "Phone": "+92-51-111222333",
+        "Email": "info@alphaisp.com",
+        "City": "Islamabad",
+        "Notes": "Active fiber ISP with 200 clients",
+        "Category": "ISP",
+        "MikroTik": "CCR1036"
+      },
+      "drive_account": "drive-1",
+      "imported_at": "2026-09-22T20:41:03+05:00"
+    },
+    {
+      "id": "drive-backup:2",
+      "company": "Apex Call Solutions",
+      "contact": "",
+      "phone": "+92-51-444555666",
+      "email": "contact@apexcalls.com",
+      "website": "",
+      "city": "Rawalpindi",
+      "country": "",
+      "category": "Call Center",
+      "status": "",
+      "notes": "Inbound support 50 seats",
+      "source": "Drive backup (darkshadowwon)",
+      "fields": {
+        "Company": "Apex Call Solutions",
+        "Phone": "+92-51-444555666",
+        "Email": "contact@apexcalls.com",
+        "City": "Rawalpindi",
+        "Notes": "Inbound support 50 seats",
+        "Category": "Call Center"
+      },
+      "drive_account": "drive-1",
+      "imported_at": "2026-09-22T20:41:03+05:00"
+    },
+    {
+      "id": "drive-backup:3",
+      "company": "CloudBPO Global",
+      "contact": "Tariq Mehmood",
+      "phone": "+92-42-333444555",
+      "email": "info@cloudbpoglobal.com",
+      "website": "https://cloudbpoglobal.com",
+      "city": "Lahore",
+      "country": "",
+      "category": "BPO",
+      "status": "",
+      "notes": "",
+      "source": "Drive backup (darkshadowwon)",
+      "fields": {
+        "Company": "CloudBPO Global",
+        "Contact": "Tariq Mehmood",
+        "Phone": "+92-42-333444555",
+        "Email": "info@cloudbpoglobal.com",
+        "Website": "https://cloudbpoglobal.com",
+        "Address": "14 Main Boulevard Gulberg",
+        "City": "Lahore",
+        "Category": "BPO",
+        "Employees": "150",
+        "Services": "Customer Support & Backoffice"
+      },
+      "drive_account": "drive-1",
+      "imported_at": "2026-09-22T20:41:03+05:00"
+    },
+    {
+      "id": "drive-backup:4",
+      "company": "Nexus Outsource Services",
+      "contact": "Ayesha Khan",
+      "phone": "+92-51-888999000",
+      "email": "hr@nexusoutsource.com",
+      "website": "https://nexusoutsource.com",
+      "city": "Islamabad",
+      "country": "",
+      "category": "BPO",
+      "status": "",
+      "notes": "",
+      "source": "Drive backup (darkshadowwon)",
+      "fields": {
+        "Company": "Nexus Outsource Services",
+        "Contact": "Ayesha Khan",
+        "Phone": "+92-51-888999000",
+        "Email": "hr@nexusoutsource.com",
+        "Website": "https://nexusoutsource.com",
+        "Address": "Blue Area F-6",
+        "City": "Islamabad",
+        "Category": "BPO",
+        "Employees": "75",
+        "Services": "Inbound BPO"
+      },
+      "drive_account": "drive-1",
+      "imported_at": "2026-09-22T20:41:03+05:00"
+    },
+    {
+      "id": "drive-backup:5",
+      "company": "SwiftCall International",
+      "contact": "Usman Ali",
+      "phone": "+92-21-999888777",
+      "email": "sales@swiftcall.com",
+      "website": "https://swiftcall.com",
+      "city": "Karachi",
+      "country": "",
+      "category": "Call Center",
+      "status": "",
+      "notes": "",
+      "source": "Drive backup (darkshadowwon)",
+      "fields": {
+        "Company": "SwiftCall International",
+        "Contact": "Usman Ali",
+        "Phone": "+92-21-999888777",
+        "Email": "sales@swiftcall.com",
+        "Website": "https://swiftcall.com",
+        "City": "Karachi",
+        "Location": "Shahrah-e-Faisal",
+        "Category": "Call Center",
+        "DIDs": "100 DIDs"
+      },
+      "drive_account": "drive-1",
+      "imported_at": "2026-09-22T20:41:03+05:00"
+    },
+    {
+      "id": "drive-backup:6",
+      "company": "Alpha ISP Networks",
+      "contact": "Reception",
+      "phone": "+92-51-111222333",
+      "email": "billing@alphaisp.com",
+      "website": "https://alphaisp.com",
+      "city": "Islamabad",
+      "country": "",
+      "category": "Call Center",
+      "status": "",
+      "notes": "",
+      "source": "Drive backup (darkshadowwon)",
+      "fields": {
+        "Company": "Alpha ISP Networks",
+        "Contact": "Reception",
+        "Phone": "+92-51-111222333",
+        "Email": "billing@alphaisp.com",
+        "Website": "https://alphaisp.com",
+        "City": "Islamabad",
+        "Location": "I-8 Markaz",
+        "Category": "Call Center",
+        "DIDs": "30 DIDs"
+      },
+      "drive_account": "drive-1",
+      "imported_at": "2026-09-22T20:41:03+05:00"
+    },
+    {
+      "id": "drive-backup:7",
+      "company": "FiberTech Broadband",
+      "contact": "",
+      "phone": "+92-51-777888999",
+      "email": "support@fibertech.pk",
+      "website": "",
+      "city": "Islamabad",
+      "country": "",
+      "category": "ISP",
+      "status": "",
+      "notes": "FTTH Gigabit GPON Provider",
+      "source": "Drive backup (darkshadowwon)",
+      "fields": {
+        "Company": "FiberTech Broadband",
+        "Phone": "+92-51-777888999",
+        "Email": "support@fibertech.pk",
+        "City": "Islamabad",
+        "Notes": "FTTH Gigabit GPON Provider",
+        "Category": "ISP",
+        "MikroTik": "CCR2004"
+      },
+      "drive_account": "drive-1",
+      "imported_at": "2026-09-22T20:41:03+05:00"
+    }
+  ],
+  "drive_accounts": {
+    "drive-1": "darkshadowwon@gmail.com",
+    "drive-2": "Kingofheck105@gmail.com"
+  }
 }

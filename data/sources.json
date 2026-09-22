@@ -1,7 +1,7 @@
 {
-  "updated_at": "2026-09-22T20:19:38+05:00",
+  "updated_at": "2026-09-22T20:41:03+05:00",
   "drive_folder": "https://drive.google.com/drive/folders/1BNBIOi--KxiUqjADdRdY4FYvGot1Hr5F",
-  "notes": "Share sheets as Anyone with the link → Viewer. On mobile paste the link; do not use Drive file picker. Multi-Drive: browser localStorage is cache only; durable saves go to Google Drive via CEO BOT / Grok Bot (see storage_registry). When Drive 1 is full, attach Drive 2 / Drive 3 spillover slots.",
+  "notes": "Sheet paste: any columns OK (Name/Company not required). Sheets must be Anyone with the link → Viewer for live fetch. Drive 1+2 JSON snapshots synced 2026-09-22T20:41:03+05:00",
   "sheets": [
     {
       "id": "1bu5PqvD1Mc7yffnK9zjhB1ZlFyk7yePOMABb1jZQxEM",
@@ -25,5 +25,19 @@
       "records": 2
     }
   ],
-  "storage_registry": "data/storage-drives.json"
+  "storage_registry": "data/storage-drives.json",
+  "drive_sync": {
+    "drive-1": {
+      "email": "darkshadowwon@gmail.com",
+      "agency_leads": 256,
+      "central_leads": 7,
+      "folder": "https://drive.google.com/drive/folders/1BNBIOi--KxiUqjADdRdY4FYvGot1Hr5F"
+    },
+    "drive-2": {
+      "email": "Kingofheck105@gmail.com",
+      "status": "spillover_armed",
+      "note": "Same CRM snapshot mirrored on Drive 2 root; sheet tabs still need Anyone-with-link to scrape live"
+    },
+    "backup_leads_imported": 7
+  }
 }
