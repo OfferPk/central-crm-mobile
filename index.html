@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#0b1220"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>Central CRM</title>
+<link rel="manifest" href="manifest.webmanifest"/>
+<style>
+  :root {
+    --bg:#0b1220; --card:#151d2e; --line:#243049; --text:#eef3ff; --muted:#93a0b8;
+    --accent:#5b8cff; --good:#3dd68c; --warn:#f5a524; --bad:#f07178;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);padding-bottom:88px}
+  header{position:sticky;top:0;z-index:20;background:rgba(11,18,32,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 14px 10px}
+  h1{margin:0;font-size:18px}
+  .sub{color:var(--muted);font-size:12px;margin-top:2px}
+  .tabs{display:flex;gap:8px;margin-top:10px}
+  .tab{flex:1;text-align:center;padding:10px 8px;border-radius:10px;background:#101827;border:1px solid var(--line);color:var(--muted);font-size:13px;font-weight:600}
+  .tab.active{background:#1a2740;color:var(--text);border-color:var(--accent)}
+  .searchwrap{padding:10px 14px;position:sticky;top:96px;z-index:15;background:var(--bg)}
+  input#q{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:16px}
+  .filters{display:flex;gap:8px;overflow-x:auto;padding:0 14px 8px;-webkit-overflow-scrolling:touch}
+  .chip{white-space:nowrap;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted);font-size:12px}
+  .chip.on{background:#1a2740;color:var(--text);border-color:var(--accent)}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 14px 10px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
+  .stat .l{font-size:11px;color:var(--muted)}.stat .v{font-size:20px;font-weight:700;margin-top:2px}
+  #list{padding:0 14px;display:grid;gap:10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .name{font-size:16px;font-weight:700;margin:0 0 4px}
+  .meta{color:var(--muted);font-size:12px;line-height:1.4}
+  .pills{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+  .pill{font-size:11px;padding:3px 8px;border-radius:999px;background:#1d2a44}
+  .pill.good{background:#1d3b2a;color:var(--good)}
+  .pill.warn{background:#3b2e14;color:var(--warn)}
+  .actions{display:flex;gap:8px;margin-top:10px}
+  .btn{flex:1;text-align:center;text-decoration:none;color:var(--text);background:#1a2740;border:1px solid var(--line);border-radius:10px;padding:11px 8px;font-size:13px;font-weight:600}
+  .btn.call{border-color:#2f6b4f;background:#163328}
+  .btn.mail{border-color:#3a4f7a;background:#18233a}
+  .btn.web{border-color:#4a3f1f;background:#2a2414}
+  .empty{text-align:center;color:var(--muted);padding:40px 20px}
+  footer{position:fixed;bottom:0;left:0;right:0;background:rgba(11,18,32,.95);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));font-size:11px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>Central CRM</h1>
+  <div class="sub" id="subtitle">Loading…</div>
+  <div class="tabs">
+    <button class="tab active" data-set="central" type="button">Central (Drive)</button>
+    <button class="tab" data-set="agency" type="button">Agency pipeline</button>
+  </div>
+</header>
+<div class="searchwrap"><input id="q" type="search" placeholder="Search company, city, phone, email…" enterkeyhint="search" autocomplete="off"/></div>
+<div class="filters" id="filters"></div>
+<div class="stats" id="stats"></div>
+<div id="list"></div>
+<footer id="foot">Mobile-friendly · GitHub Pages</footer>
+<script>
+let DATA=null, SET='central', FILTER='all', Q='';
+const $=s=>document.querySelector(s);
+async function boot(){
+  DATA=await (await fetch('data/leads.json')).json();
+  $('#subtitle').textContent = `Updated ${DATA.generated_at} · Central ${DATA.counts.central} · Agency ${DATA.counts.agency}`;
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{SET=t.dataset.set;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));FILTER='all'; buildFilters(); render();});
+  $('#q').oninput=e=>{Q=e.target.value.trim().toLowerCase(); render();};
+  buildFilters(); render();
+}
+function leads(){ return SET==='central' ? (DATA.central_leads||[]) : (DATA.agency_leads||[]); }
+function buildFilters(){
+  const vals=new Set();
+  leads().forEach(L=>{ const v=(L.category||L.status||'').trim(); if(v) vals.add(v); });
+  const box=$('#filters'); box.innerHTML='';
+  const all=document.createElement('button'); all.className='chip on'; all.textContent='All'; all.onclick=()=>{FILTER='all'; [...box.children].forEach(c=>c.classList.remove('on')); all.classList.add('on'); render();};
+  box.appendChild(all);
+  [...vals].sort().forEach(v=>{
+    const b=document.createElement('button'); b.className='chip'; b.textContent=v;
+    b.onclick=()=>{FILTER=v; [...box.children].forEach(c=>c.classList.remove('on')); b.classList.add('on'); render();};
+    box.appendChild(b);
+  });
+}
+function phoneHref(p){ if(!p) return null; const n=String(p).replace(/[^\d+]/g,''); return n?`tel:${n}`:null; }
+function render(){
+  let rows=leads().filter(L=>{
+    if(FILTER!=='all'){
+      const hit=(L.category||'')===FILTER || (L.status||'')===FILTER; if(!hit) return false;
+    }
+    if(!Q) return true;
+    const blob=[L.company,L.contact,L.phone,L.email,L.city,L.category,L.status,L.notes,L.website].join(' ').toLowerCase();
+    return blob.includes(Q);
+  });
+  const withPhone=rows.filter(L=>L.phone).length, withEmail=rows.filter(L=>L.email).length;
+  $('#stats').innerHTML=`
+    <div class="stat"><div class="l">Showing</div><div class="v">${rows.length}</div></div>
+    <div class="stat"><div class="l">With phone</div><div class="v">${withPhone}</div></div>
+    <div class="stat"><div class="l">With email</div><div class="v">${withEmail}</div></div>`;
+  const list=$('#list'); list.innerHTML='';
+  if(!rows.length){ list.innerHTML='<div class="empty">No matches</div>'; return; }
+  rows.forEach(L=>{
+    const el=document.createElement('article'); el.className='card';
+    const tel=phoneHref(L.phone);
+    const mail=L.email?`mailto:${L.email}`:null;
+    const web=L.website?(L.website.startsWith('http')?L.website:'https://'+L.website):null;
+    el.innerHTML=`
+      <h2 class="name">${esc(L.company||'Untitled')}</h2>
+      <div class="meta">${esc([L.city,L.country].filter(Boolean).join(' · '))}${L.contact? ' · '+esc(L.contact):''}</div>
+      <div class="pills">
+        ${L.category?`<span class="pill">${esc(L.category)}</span>`:''}
+        ${L.status?`<span class="pill good">${esc(L.status)}</span>`:''}
+        ${L.temp?`<span class="pill warn">${esc(L.temp)}</span>`:''}
+        ${L.outreach?`<span class="pill">${esc(L.outreach)}</span>`:''}
+      </div>
+      <div class="meta">${L.phone?esc(L.phone):'No phone'} · ${L.email?esc(L.email):'No email'}</div>
+      ${L.notes?`<div class="meta" style="margin-top:6px">${esc(L.notes)}</div>`:''}
+      <div class="actions">
+        ${tel?`<a class="btn call" href="${tel}">Call</a>`:''}
+        ${mail?`<a class="btn mail" href="${mail}">Email</a>`:''}
+        ${web?`<a class="btn web" href="${web}" target="_blank" rel="noopener">Site</a>`:''}
+      </div>`;
+    list.appendChild(el);
+  });
+  $('#foot').textContent=`Central CRM mobile · ${DATA.counts.central} Drive leads · ${DATA.counts.agency} agency leads`;
+}
+function esc(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+boot().catch(e=>{ $('#subtitle').textContent='Failed to load data/leads.json'; console.error(e); });
+</script>
+</body>
+</html>
