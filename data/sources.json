@@ -1,8 +1,16 @@
 {
-  "updated_at": "2026-09-22T20:41:03+05:00",
+  "updated_at": "2026-09-22T21:06:20+05:00",
   "drive_folder": "https://drive.google.com/drive/folders/1BNBIOi--KxiUqjADdRdY4FYvGot1Hr5F",
   "notes": "Sheet paste: any columns OK (Name/Company not required). Sheets must be Anyone with the link → Viewer for live fetch. Drive 1+2 JSON snapshots synced 2026-09-22T20:41:03+05:00",
   "sheets": [
+    {
+      "id": "1zjOLiMYy3dmmftunSwVGWTM1mbsib5FyiHKl5gXs6rc",
+      "name": "Owner public sheet (Urdu ISP/leads)",
+      "url": "https://docs.google.com/spreadsheets/d/1zjOLiMYy3dmmftunSwVGWTM1mbsib5FyiHKl5gXs6rc/edit?usp=drivesdk",
+      "status": "imported_ok",
+      "records": 864,
+      "imported_at": "2026-09-22T21:06:20+05:00"
+    },
     {
       "id": "1bu5PqvD1Mc7yffnK9zjhB1ZlFyk7yePOMABb1jZQxEM",
       "name": "Pakistan ISP Leads",
