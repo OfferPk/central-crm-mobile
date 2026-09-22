@@ -8,7 +8,7 @@
 <title>Central CRM</title>
 <link rel="manifest" href="manifest.webmanifest"/>
 <style>
-:root{--bg:#0b1220;--card:#151d2e;--line:#243049;--text:#eef3ff;--muted:#93a0b8;--accent:#5b8cff;--good:#3dd68c;--warn:#f5a524;--bad:#f07178}
+:root{--bg:#0b1220;--card:#151d2e;--line:#243049;--text:#eef3ff;--muted:#93a0b8;--accent:#5b8cff;--good:#3dd68c;--bad:#f07178}
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);padding-bottom:96px}
 header{position:sticky;top:0;z-index:30;background:rgba(11,18,32,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 14px}
@@ -51,6 +51,7 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);ba
 .empty{text-align:center;color:var(--muted);padding:40px 20px}
 footer{position:fixed;bottom:0;left:0;right:0;background:rgba(11,18,32,.95);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));font-size:11px;color:var(--muted);text-align:center}
 .src{font-size:12px;color:var(--muted);padding:8px 0;border-bottom:1px dashed var(--line)}
+details summary{color:var(--muted);font-size:13px;cursor:pointer;margin-top:8px}
 @media(min-width:900px){body{max-width:980px;margin:0 auto}}
 </style>
 </head>
@@ -73,19 +74,237 @@ footer{position:fixed;bottom:0;left:0;right:0;background:rgba(11,18,32,.95);bord
 
 <section class="panel" id="addPanel">
   <strong>Add Google Sheet (paste link)</strong>
-  <div class="hint"><b>Mobile tip:</b> Drive se file Select mat karo — woh CSV picker hai, Sheet select nahi hoti. Sheet ko Share → Anyone with the link → Viewer banao, phir link yahan <b>paste</b> karo.</div>
+  <div class="hint"><b>Mobile:</b> Drive “Select” mat dabao — woh grey rahega. Sheet open karo → Share → <b>Anyone with the link → Viewer</b> → link copy → yahan <b>paste</b>.</div>
   <label>Name (optional)</label>
   <input id="sheetName" placeholder="e.g. Dubai Fabric & Textile Leads"/>
-  <label>Google Sheet link (paste)</label>
+  <label>Google Sheet link (paste here)</label>
   <input id="sheetUrl" inputmode="url" autocomplete="off" placeholder="https://docs.google.com/spreadsheets/d/..../edit"/>
   <div class="row" style="margin-top:10px">
     <button class="btn good" id="btnFetch" type="button">Fetch &amp; save</button>
     <button class="btn" id="btnCloseAdd" type="button">Close</button>
   </div>
-  <details style="margin-top:12px">
-    <summary style="color:#93a0b8;font-size:13px;cursor:pointer">Advanced: upload CSV file (not Google Sheet)</summary>
-    <div class="hint">Sirf .csv file. Google Sheet Drive picker se select nahi hogi — pehle Sheet → File → Download → CSV.</div>
-    <input id="csvFile" type="file" accept=".csv,text/csv" style="margin-top:8px"/>
+  <details>
+    <summary>Advanced: upload CSV file (not a Google Sheet)</summary>
+    <div class="hint">Sheet → File → Download → Comma-separated values (.csv), phir yahan choose karo.</div>
+    <input id="csvFile" type="file" accept=".csv,text/csv"/>
   </details>
   <div class="msg" id="addMsg"></div>
 </section>
+
+<section class="panel" id="srcPanel">
+  <strong>Registered sources</strong>
+  <div id="srcList" class="hint">None yet</div>
+  <button class="btn" id="btnCloseSrc" type="button" style="margin-top:8px">Close</button>
+</section>
+
+<div class="searchwrap"><input id="q" type="search" placeholder="Search company, city, phone, email…" autocomplete="off"/></div>
+<div class="filters" id="filters"></div>
+<div class="stats" id="stats"></div>
+<div id="list"></div>
+<footer id="foot">Central CRM · mobile + Windows</footer>
+
+<script>
+const STORE_KEY='central_crm_v3';
+let BASE=null, EXTRA={sources:[],leads:[]}, SET='all', FILTER='all', Q='';
+const $=s=>document.querySelector(s);
+function showMsg(el,type,text){ el.className='msg '+type; el.textContent=text; }
+function sheetIdFromUrl(url){ const m=String(url||'').match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/); return m?m[1]:null; }
+function csvUrls(id){
+  return [
+    `https://docs.google.com/spreadsheets/d/${id}/export?format=csv`,
+    `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=0`,
+    `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv`,
+    `https://docs.google.com/spreadsheets/d/${id}/pub?output=csv`
+  ];
+}
+function parseCSV(text){
+  const rows=[]; let row=[], cell='', i=0, q=false;
+  text=String(text||'').replace(/^\uFEFF/,'');
+  while(i<text.length){
+    const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){ cell+='"'; i+=2; continue;} q=false; i++; continue;} cell+=c; i++; continue; }
+    if(c==='"'){ q=true; i++; continue; }
+    if(c===','){ row.push(cell); cell=''; i++; continue; }
+    if(c==='\n'){ row.push(cell); rows.push(row); row=[]; cell=''; i++; continue; }
+    if(c==='\r'){ i++; continue; }
+    cell+=c; i++;
+  }
+  if(cell.length||row.length){ row.push(cell); rows.push(row); }
+  return rows.filter(r=>r.some(x=>String(x).trim()!==''));
+}
+function normKey(k){ return String(k||'').trim().toLowerCase().replace(/\s+/g,'_'); }
+function rowsToLeads(rows, meta){
+  if(!rows.length) return [];
+  const headers=rows[0].map(normKey);
+  const pick=(obj,names)=>{ for(const n of names){ if(obj[n]) return obj[n]; } return ''; };
+  const out=[];
+  for(const r of rows.slice(1)){
+    const obj={}; headers.forEach((h,idx)=>obj[h]=(r[idx]||'').trim());
+    const company=pick(obj,['company','company_name','business','business_name','name','bpo','firm','organization','lead','title']);
+    if(!company) continue;
+    out.push({
+      id: meta.id+':'+(out.length+1), source_id: meta.id, company,
+      contact: pick(obj,['contact','contact_person','person','owner']),
+      phone: pick(obj,['phone','mobile','whatsapp','contact_number','phone_number']),
+      email: pick(obj,['email','e-mail','mail']),
+      website: pick(obj,['website','url','site','web']),
+      city: pick(obj,['city','location','area','address']),
+      country: pick(obj,['country'])||'Pakistan',
+      category: pick(obj,['category','category_name','type','industry','segment'])||meta.name||'Sheet',
+      status: pick(obj,['status','lead_status','stage'])||'Imported',
+      notes: pick(obj,['notes','note','remarks','comment']),
+      source: meta.name||meta.url, imported_at: new Date().toISOString()
+    });
+  }
+  return out;
+}
+async function fetchSheetCSV(id){
+  let lastErr;
+  for(const url of csvUrls(id)){
+    try{
+      const res=await fetch(url,{mode:'cors'});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const text=await res.text();
+      const low=text.toLowerCase();
+      if(low.includes('<html')||low.includes('sign in')||low.includes('<!doctype')) throw new Error('Sheet not public');
+      return text;
+    }catch(e){ lastErr=e; }
+  }
+  throw lastErr||new Error('Fetch failed');
+}
+function loadExtra(){
+  try{ EXTRA=JSON.parse(localStorage.getItem(STORE_KEY)||'{"sources":[],"leads":[]}'); }catch(e){ EXTRA={sources:[],leads:[]}; }
+  if(!Array.isArray(EXTRA.sources)) EXTRA.sources=[];
+  if(!Array.isArray(EXTRA.leads)) EXTRA.leads=[];
+}
+function saveExtra(){ localStorage.setItem(STORE_KEY, JSON.stringify(EXTRA)); }
+function allLeads(){
+  const central=(BASE.central_leads||[]).map(L=>({...L,_bucket:'central'}));
+  const agency=(BASE.agency_leads||[]).map(L=>({...L,_bucket:'agency'}));
+  const sheets=[...(BASE.sheet_leads||[]), ...EXTRA.leads].map(L=>({...L,_bucket:'sheets'}));
+  if(SET==='central') return central;
+  if(SET==='agency') return agency;
+  if(SET==='sheets') return sheets;
+  return [...sheets,...central,...agency];
+}
+function buildFilters(){
+  const vals=new Set();
+  allLeads().forEach(L=>{ const v=(L.category||L.status||'').trim(); if(v) vals.add(v); });
+  const box=$('#filters'); box.innerHTML='';
+  const mk=(label,val,on)=>{
+    const b=document.createElement('button'); b.type='button'; b.className='chip'+(on?' on':''); b.textContent=label;
+    b.onclick=()=>{ FILTER=val; [...box.children].forEach(c=>c.classList.remove('on')); b.classList.add('on'); render(); };
+    box.appendChild(b);
+  };
+  mk('All','all',FILTER==='all');
+  [...vals].sort().slice(0,24).forEach(v=>mk(v,v,FILTER===v));
+}
+function phoneHref(p){ if(!p) return null; const n=String(p).replace(/[^\d+]/g,''); return n?`tel:${n}`:null; }
+function esc(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+function render(){
+  let rows=allLeads().filter(L=>{
+    if(FILTER!=='all' && (L.category||'')!==FILTER && (L.status||'')!==FILTER) return false;
+    if(!Q) return true;
+    const blob=[L.company,L.contact,L.phone,L.email,L.city,L.category,L.status,L.notes,L.website,L.source].join(' ').toLowerCase();
+    return blob.includes(Q);
+  });
+  $('#stats').innerHTML=`
+    <div class="stat"><div class="l">Showing</div><div class="v">${rows.length}</div></div>
+    <div class="stat"><div class="l">With phone</div><div class="v">${rows.filter(L=>L.phone).length}</div></div>
+    <div class="stat"><div class="l">With email</div><div class="v">${rows.filter(L=>L.email).length}</div></div>`;
+  const list=$('#list'); list.innerHTML='';
+  if(!rows.length){ list.innerHTML='<div class="empty">No matches. Tap + Add Google Sheet and paste a public link.</div>'; return; }
+  rows.slice(0,500).forEach(L=>{
+    const el=document.createElement('article'); el.className='card';
+    const tel=phoneHref(L.phone);
+    const mail=L.email?`mailto:${encodeURIComponent(L.email)}`:null;
+    const web=L.website?(L.website.startsWith('http')?L.website:'https://'+L.website):null;
+    el.innerHTML=`
+      <h2 class="name">${esc(L.company||'Untitled')}</h2>
+      <div class="meta">${esc([L.city,L.country].filter(Boolean).join(' · '))}${L.contact?' · '+esc(L.contact):''}</div>
+      <div class="pills">
+        ${L._bucket?`<span class="pill">${esc(L._bucket)}</span>`:''}
+        ${L.category?`<span class="pill">${esc(L.category)}</span>`:''}
+        ${L.status?`<span class="pill good">${esc(L.status)}</span>`:''}
+      </div>
+      <div class="meta">${L.phone?esc(L.phone):'No phone'} · ${L.email?esc(L.email):'No email'}</div>
+      ${L.source?`<div class="meta">Source: ${esc(L.source)}</div>`:''}
+      ${L.notes?`<div class="meta" style="margin-top:6px">${esc(L.notes)}</div>`:''}
+      <div class="actions">
+        ${tel?`<a class="call" href="${tel}">Call</a>`:''}
+        ${mail?`<a class="mail" href="${mail}">Email</a>`:''}
+        ${web?`<a href="${web}" target="_blank" rel="noopener">Site</a>`:''}
+      </div>`;
+    list.appendChild(el);
+  });
+  const nC=(BASE.central_leads||[]).length, nA=(BASE.agency_leads||[]).length, nS=(BASE.sheet_leads||[]).length+EXTRA.leads.length;
+  $('#foot').textContent=`Drive ${nC} · Sheets ${nS} · Agency ${nA} · Device sources ${EXTRA.sources.length}`;
+  $('#subtitle').textContent=`Updated ${BASE.generated_at||''} · Paste sheet links (do not use Drive Select)`;
+}
+function renderSources(){
+  const all=[...EXTRA.sources.map(s=>({...s,origin:'device'})), ...(BASE.sources||[]).map(s=>({...s,origin:'repo'}))];
+  const box=$('#srcList');
+  if(!all.length){ box.textContent='No sources yet'; return; }
+  box.innerHTML=all.map(s=>`<div class="src"><b>${esc(s.name||s.id||'Sheet')}</b> · ${esc(s.status||s.origin||'')} · ${s.records!=null?(s.records+' rows · '):''}<a href="${esc(s.url||'#')}" target="_blank" rel="noopener">open</a></div>`).join('');
+}
+async function addSheetFromUrl(){
+  const url=$('#sheetUrl').value.trim();
+  const name=$('#sheetName').value.trim()||'Imported sheet';
+  const msg=$('#addMsg');
+  const id=sheetIdFromUrl(url);
+  if(!id){ showMsg(msg,'err','Valid Google Sheet link paste karo'); return; }
+  showMsg(msg,'info','Fetching sheet…');
+  try{
+    const text=await fetchSheetCSV(id);
+    const leads=rowsToLeads(parseCSV(text),{id,name,url});
+    if(!leads.length){ showMsg(msg,'err','Rows nahi mili. Header mein Company/Name column rakho.'); return; }
+    EXTRA.sources=EXTRA.sources.filter(s=>s.id!==id);
+    EXTRA.sources.unshift({id,name,url,status:'ok',records:leads.length,added_at:new Date().toISOString()});
+    EXTRA.leads=EXTRA.leads.filter(L=>L.source_id!==id).concat(leads);
+    saveExtra(); SET='sheets';
+    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.set==='sheets'));
+    buildFilters(); render(); renderSources();
+    showMsg(msg,'ok', leads.length+' leads import + is device pe save.');
+  }catch(e){
+    showMsg(msg,'err','Fetch fail: '+(e.message||e)+'. Sheet Share → Anyone with link → Viewer, phir dubara try. Ya CSV download karke Advanced se upload.');
+  }
+}
+async function addSheetFromFile(file){
+  const msg=$('#addMsg');
+  showMsg(msg,'info','Reading CSV…');
+  const text=await file.text();
+  const id='csv_'+Date.now();
+  const name=$('#sheetName').value.trim()||file.name||'CSV upload';
+  const leads=rowsToLeads(parseCSV(text),{id,name,url:file.name});
+  if(!leads.length){ showMsg(msg,'err','CSV parse fail / company column missing'); return; }
+  EXTRA.sources.unshift({id,name,url:file.name,status:'csv_upload',records:leads.length,added_at:new Date().toISOString()});
+  EXTRA.leads=EXTRA.leads.concat(leads);
+  saveExtra(); SET='sheets';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.set==='sheets'));
+  buildFilters(); render(); renderSources();
+  showMsg(msg,'ok', leads.length+' leads CSV se save.');
+}
+async function boot(){
+  loadExtra();
+  BASE=await (await fetch('data/leads.json?ts='+Date.now())).json();
+  try{ const src=await (await fetch('data/sources.json?ts='+Date.now())).json(); BASE.sources=src.sheets||[]; }catch(e){}
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+    SET=t.dataset.set; document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t)); FILTER='all'; buildFilters(); render();
+  });
+  $('#q').oninput=e=>{ Q=e.target.value.trim().toLowerCase(); render(); };
+  $('#btnAdd').onclick=()=>{ $('#addPanel').classList.add('open'); $('#srcPanel').classList.remove('open'); };
+  $('#btnCloseAdd').onclick=()=>$('#addPanel').classList.remove('open');
+  $('#btnSources').onclick=()=>{ renderSources(); $('#srcPanel').classList.add('open'); $('#addPanel').classList.remove('open'); };
+  $('#btnCloseSrc').onclick=()=>$('#srcPanel').classList.remove('open');
+  $('#btnFetch').onclick=addSheetFromUrl;
+  $('#csvFile').onchange=e=>{ const f=e.target.files&&e.target.files[0]; if(f) addSheetFromFile(f); };
+  $('#btnExport').onclick=()=>{
+    const blob=new Blob([JSON.stringify({exported_at:new Date().toISOString(),sources:EXTRA.sources,leads:EXTRA.leads},null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='central-crm-local.json'; a.click();
+  };
+  buildFilters(); render();
+}
+boot().catch(e=>{ $('#subtitle').textContent='Failed to load CRM data'; console.error(e); });
+</script>
+</body>
+</html>
