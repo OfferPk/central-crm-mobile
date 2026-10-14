@@ -3,109 +3,161 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<meta name="theme-color" content="#0b1220"/>
+<meta name="theme-color" content="#f4f7fb"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <title>Central CRM</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232859c5'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='sans-serif' font-size='24' font-weight='700' fill='white'%3ECC%3C/text%3E%3C/svg%3E"/>
 <link rel="manifest" href="manifest.webmanifest"/>
 <style>
-:root{--bg:#0b1220;--card:#151d2e;--line:#243049;--text:#eef3ff;--muted:#93a0b8;--accent:#5b8cff;--good:#3dd68c;--bad:#f07178}
+:root{color-scheme:light;--bg:#f4f7fb;--surface:#fff;--surface-soft:#f8fafd;--line:#e1e8f0;--ink:#152238;--muted:#66758c;--accent:#2859c5;--accent-dark:#1f469e;--accent-soft:#edf3ff;--good:#16734a;--good-soft:#e8f6ef;--bad:#a33d49;--bad-soft:#fff0f1;--shadow:0 12px 32px rgba(23,42,72,.07)}
 *{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);padding-bottom:96px}
-header{position:sticky;top:0;z-index:30;background:rgba(11,18,32,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:12px 14px}
-h1{margin:0;font-size:18px}
-.sub{color:var(--muted);font-size:12px;margin-top:3px}
-.row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.btn,.tab{border:1px solid var(--line);background:#101827;color:var(--text);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;cursor:pointer}
-.tab{flex:1;text-align:center;color:var(--muted);min-width:88px}
-.tab.active{background:#1a2740;color:var(--text);border-color:var(--accent)}
-.btn.primary{background:#1a3a6b;border-color:var(--accent)}
-.btn.good{background:#163328;border-color:#2f6b4f}
-.panel{display:none;padding:12px 14px;border-bottom:1px solid var(--line);background:#0e1624}
-.panel.open{display:block}
-label{display:block;font-size:12px;color:var(--muted);margin:8px 0 4px}
-input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:16px}
-.hint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.45}
-.msg{margin-top:8px;padding:10px;border-radius:10px;font-size:13px;display:none}
-.msg.ok{display:block;background:#163328;color:var(--good)}
-.msg.err{display:block;background:#3b1d24;color:var(--bad)}
-.msg.info{display:block;background:#1a2740;color:var(--text)}
-.searchwrap{padding:10px 14px}
-#q{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:16px}
-.filters{display:flex;gap:8px;overflow-x:auto;padding:0 14px 8px}
-.chip{white-space:nowrap;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted);font-size:12px}
-.chip.on{background:#1a2740;color:var(--text);border-color:var(--accent)}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 14px 10px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
-.stat .l{font-size:11px;color:var(--muted)}.stat .v{font-size:20px;font-weight:700;margin-top:2px}
-#list{padding:0 14px;display:grid;gap:10px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
-.name{font-size:16px;font-weight:700;margin:0 0 4px}
-.meta{color:var(--muted);font-size:12px;line-height:1.4}
-.pills{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
-.pill{font-size:11px;padding:3px 8px;border-radius:999px;background:#1d2a44}
-.pill.good{background:#1d3b2a;color:var(--good)}
-.actions{display:flex;gap:8px;margin-top:10px}
-.actions a{flex:1;text-align:center;text-decoration:none;color:var(--text);background:#1a2740;border:1px solid var(--line);border-radius:10px;padding:11px 8px;font-size:13px;font-weight:600}
-.actions a.call{border-color:#2f6b4f;background:#163328}
-.actions a.mail{border-color:#3a4f7a;background:#18233a}
-.empty{text-align:center;color:var(--muted);padding:40px 20px}
-footer{position:fixed;bottom:0;left:0;right:0;background:rgba(11,18,32,.95);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));font-size:11px;color:var(--muted);text-align:center}
-.src{font-size:12px;color:var(--muted);padding:8px 0;border-bottom:1px dashed var(--line)}
-.drive{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:8px}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:radial-gradient(ellipse at 82% -8%,rgba(207,225,255,.42),transparent 32rem),var(--bg);color:var(--ink);padding-bottom:88px;-webkit-font-smoothing:antialiased}
+button,input{font:inherit}
+button,a{-webkit-tap-highlight-color:transparent}
+.site-header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-bottom:1px solid rgba(219,228,239,.9);box-shadow:0 4px 18px rgba(25,43,71,.035)}
+.header-inner{max-width:1220px;margin:0 auto;padding:14px 22px;display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.brand-row{display:flex;align-items:center;justify-content:space-between;gap:14px;min-width:0}
+.brand-lockup{display:flex;align-items:center;gap:11px;min-width:0}
+.brand-mark{width:42px;height:42px;display:grid;place-items:center;flex:0 0 auto;border-radius:14px;background:linear-gradient(145deg,#3671e8,#214db1);color:white;font-size:13px;font-weight:800;letter-spacing:-.04em;box-shadow:0 7px 16px rgba(40,89,197,.23)}
+h1{margin:0;font-size:19px;line-height:1.15;letter-spacing:-.025em}
+.brand-caption{color:var(--muted);font-size:11px;font-weight:650;letter-spacing:.11em;text-transform:uppercase;margin-top:4px}
+.header-status{display:flex;align-items:center;gap:7px;min-width:0;color:var(--muted);font-size:11px;line-height:1.35;text-align:right}
+.status-dot{width:7px;height:7px;flex:0 0 auto;border-radius:50%;background:#37a576;box-shadow:0 0 0 3px #e6f6ee}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tab-row{gap:5px;overflow-x:auto;flex-wrap:nowrap;padding:4px;background:#f3f6fa;border:1px solid #e9eef4;border-radius:13px;scrollbar-width:none}
+.tab-row::-webkit-scrollbar,.filters::-webkit-scrollbar,.toolbar-actions::-webkit-scrollbar{display:none}
+.btn,.tab{min-height:42px;border:1px solid #dce4ee;background:#fff;color:#41516a;border-radius:11px;padding:10px 13px;font-size:13px;font-weight:650;white-space:nowrap;cursor:pointer;transition:background .16s ease,border-color .16s ease,color .16s ease,transform .16s ease,box-shadow .16s ease}
+.btn:hover,.tab:hover{border-color:#b9c9df;background:#f9fbff;color:var(--ink)}
+.btn:active,.tab:active{transform:translateY(1px)}
+.tab{flex:1;text-align:center;min-width:76px;min-height:38px;padding:8px 12px;border-color:transparent;background:transparent;color:#68778d}
+.tab.active{background:#fff;color:var(--accent-dark);border-color:#e2e9f3;box-shadow:0 2px 7px rgba(28,47,78,.07)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 5px 13px rgba(40,89,197,.17)}
+.btn.primary:hover{background:var(--accent-dark);border-color:var(--accent-dark);color:#fff}
+.btn.good{background:var(--good);border-color:var(--good);color:#fff}
+.btn.good:hover{background:#105f3c;border-color:#105f3c;color:#fff}
+.toolbar-actions{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.toolbar-actions .btn{flex:0 0 auto}
+.workspace{max-width:1220px;margin:0 auto;padding:21px 22px 110px}
+.panel{display:none;padding:22px;margin:0 0 18px;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+.panel.open{display:block;animation:panel-in .18s ease-out}
+@keyframes panel-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.panel-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:15px}
+.panel-heading h2{font-size:17px;letter-spacing:-.02em;margin:3px 0 0}
+.section-kicker{color:var(--accent);font-size:10px;font-weight:750;letter-spacing:.12em;text-transform:uppercase}
+.panel-heading .hint{max-width:480px;margin:2px 0 0}
+.form-grid{display:grid;grid-template-columns:1fr;gap:4px 14px}
+label{display:block;font-size:12px;color:#465772;font-weight:650;margin:11px 0 6px}
+input{width:100%;min-height:46px;padding:11px 13px;border-radius:11px;border:1px solid #d9e2ed;background:#fbfcfe;color:var(--ink);font-size:15px;outline:none;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease}
+input::placeholder{color:#96a2b3}
+input:focus{border-color:#6f96e8;background:#fff;box-shadow:0 0 0 3px rgba(68,117,215,.13)}
+.hint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.55}
+.panel-intro{padding:12px 14px;border:1px solid #e6edf8;border-radius:12px;background:#f6f9ff;color:#53647c;font-size:12px;line-height:1.55;margin:0 0 10px}
+.panel-intro b{color:#263b5b}
+.msg{margin-top:12px;padding:11px 13px;border-radius:11px;font-size:13px;line-height:1.45;display:none}
+.msg.ok{display:block;background:var(--good-soft);color:var(--good);border:1px solid #cfe9d9}
+.msg.err{display:block;background:var(--bad-soft);color:var(--bad);border:1px solid #f2d4d8}
+.msg.info{display:block;background:var(--accent-soft);color:#314d80;border:1px solid #d9e5fb}
+.searchwrap{padding:0;margin-bottom:13px}
+.search-field{position:relative}
+.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:#8694a8;pointer-events:none}
+#q{padding:13px 15px 13px 43px;min-height:48px;border-radius:13px;background:#fff;box-shadow:0 4px 12px rgba(31,49,78,.035);font-size:15px}
+.filters{display:flex;gap:7px;overflow-x:auto;padding:0 0 14px;scrollbar-width:thin;scrollbar-color:#d5deea transparent}
+.chip{min-height:34px;white-space:nowrap;padding:7px 12px;border-radius:999px;border:1px solid #dce4ee;background:#fff;color:#62718a;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s ease}
+.chip:hover{border-color:#b9c9df;color:var(--ink)}
+.chip.on{background:var(--accent-soft);color:var(--accent-dark);border-color:#bfd0f2}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;padding:0 0 17px}
+.stat{min-width:0;background:linear-gradient(145deg,#fff,#fbfcff);border:1px solid var(--line);border-radius:14px;padding:12px 13px;box-shadow:0 3px 11px rgba(29,47,75,.025)}
+.stat .l{font-size:10px;color:#748198;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat .v{font-size:22px;line-height:1.1;letter-spacing:-.04em;font-variant-numeric:tabular-nums;font-weight:760;margin-top:7px;color:#1e2e47}
+#list{display:grid;grid-template-columns:minmax(0,1fr);gap:11px}
+.card{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 4px 14px rgba(25,43,71,.035);transition:box-shadow .16s ease,border-color .16s ease,transform .16s ease}
+.card:hover{border-color:#cfdae8;box-shadow:0 9px 23px rgba(25,43,71,.075);transform:translateY(-1px)}
+.name{font-size:16px;line-height:1.3;letter-spacing:-.02em;font-weight:720;margin:0 0 5px;overflow-wrap:anywhere}
+.meta{color:var(--muted);font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin:11px 0 9px}
+.pill{display:inline-flex;align-items:center;min-height:23px;font-size:10px;font-weight:680;letter-spacing:.025em;padding:3px 9px;border-radius:999px;background:#f0f3f8;color:#586a82}
+.pill.good{background:var(--good-soft);color:var(--good)}
+.card .meta b{color:#4c5e78;font-weight:650}
+.actions{display:flex;gap:7px;margin-top:14px;padding-top:12px;border-top:1px solid #edf1f6}
+.actions a{flex:1;min-width:0;min-height:39px;display:flex;align-items:center;justify-content:center;text-align:center;text-decoration:none;color:#475a76;background:#f8fafd;border:1px solid #e3eaf2;border-radius:10px;padding:9px 8px;font-size:12px;font-weight:680;transition:all .15s ease}
+.actions a:hover{background:#f0f5ff;border-color:#cbd9f0;color:var(--accent-dark)}
+.actions a.call{border-color:#cce8d8;background:#f0faf4;color:#176d48}
+.actions a.call:hover{background:#e5f6ed;border-color:#9fd5b7}
+.actions a.mail{border-color:#d9e4f6;background:#f3f7ff;color:#355c9d}
+.empty{text-align:center;color:var(--muted);padding:38px 20px;background:#fff;border:1px dashed #ccd7e5;border-radius:16px;grid-column:1/-1}
+footer{position:fixed;bottom:0;left:0;right:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-top:1px solid rgba(219,228,239,.9);padding:12px 16px calc(12px + env(safe-area-inset-bottom));font-size:11px;font-weight:600;color:#68778d;text-align:center}
+.src{font-size:12px;color:var(--muted);padding:11px 0;border-bottom:1px dashed var(--line);overflow-wrap:anywhere}
+.src a,.panel a{color:var(--accent-dark);font-weight:650}
+.drive{background:#fbfcfe;border:1px solid var(--line);border-radius:13px;padding:14px;margin-top:9px}
 .drive .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap}
-.drive .badge{font-size:11px;padding:3px 8px;border-radius:999px;background:#1d2a44;color:var(--muted)}
-.drive .badge.on{background:#1d3b2a;color:var(--good)}
-.drive .badge.full{background:#3b1d24;color:var(--bad)}
-.drive .badge.ready{background:#1a2740;color:var(--text)}
-details summary{color:var(--muted);font-size:13px;cursor:pointer;margin-top:8px}
-@media(min-width:900px){body{max-width:980px;margin:0 auto}}
+.drive .badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:.02em;padding:4px 8px;border-radius:999px;background:#f0f3f8;color:#6b7890}
+.drive .badge.on{background:var(--good-soft);color:var(--good)}
+.drive .badge.full{background:var(--bad-soft);color:var(--bad)}
+.drive .badge.ready{background:var(--accent-soft);color:#3c5b94}
+details{margin-top:14px;padding-top:12px;border-top:1px solid #edf1f6}
+details summary{color:#435672;font-size:12px;font-weight:680;cursor:pointer;list-style-position:inside}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+:focus-visible{outline:3px solid rgba(40,89,197,.45);outline-offset:2px}
+@media(min-width:700px){.header-inner{grid-template-columns:minmax(220px,1fr) auto;align-items:center;gap:10px 18px}.brand-row{grid-column:1;grid-row:1}.toolbar-actions{grid-column:2;grid-row:1;justify-content:flex-end}.tab-row{grid-column:1/-1;grid-row:2;width:max-content;max-width:100%}.workspace{padding-top:24px}.form-grid{grid-template-columns:1fr 1fr}.form-grid .wide{grid-column:1/-1}#list{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:17px}.panel{padding:24px}}
+@media(min-width:1000px){#list{grid-template-columns:repeat(3,minmax(0,1fr))}.header-inner{gap:9px 24px}.stats{gap:12px}.stat{padding:14px 16px}}
+@media(max-width:520px){.header-inner{padding:11px 14px;gap:10px}.brand-mark{width:38px;height:38px;border-radius:12px}.header-status{max-width:48%;font-size:10px}.toolbar-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;overflow:visible;gap:7px}.toolbar-actions .btn{width:100%;min-width:0;min-height:40px;padding:9px 7px;font-size:12px}.workspace{padding:15px 14px 100px}.panel{padding:17px;border-radius:15px}.panel-heading{display:block}.panel-heading .hint{margin-top:8px}.stats{gap:6px}.stat{padding:10px 9px;border-radius:12px}.stat .l{font-size:9px;letter-spacing:.055em}.stat .v{font-size:20px;margin-top:5px}.card{padding:14px}.actions{gap:6px}.actions a{padding:8px 5px;font-size:11px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
-<header>
-  <h1>Central CRM</h1>
-  <div class="sub" id="subtitle">Loading…</div>
-  <div class="row">
-    <button class="tab active" data-set="all" type="button">All</button>
-    <button class="tab" data-set="central" type="button">Drive</button>
-    <button class="tab" data-set="sheets" type="button">Sheets</button>
-    <button class="tab" data-set="agency" type="button">Agency</button>
-  </div>
-  <div class="row">
-    <button class="btn primary" id="btnAdd" type="button">+ Add Google Sheet</button>
-    <button class="btn" id="btnSources" type="button">Sources</button>
-    <button class="btn" id="btnStorage" type="button">Storage</button>
-    <button class="btn" id="btnExport" type="button">Export JSON</button>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand-row">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">CC</div>
+        <div><h1>Central CRM</h1><div class="brand-caption">Lead workspace</div></div>
+      </div>
+      <div class="header-status" role="status" aria-live="polite"><span class="status-dot" aria-hidden="true"></span><span id="subtitle">Loading your workspace…</span></div>
+    </div>
+    <nav class="row tab-row" aria-label="Lead views">
+      <button class="tab active" data-set="all" type="button" aria-pressed="true">All leads</button>
+      <button class="tab" data-set="central" type="button" aria-pressed="false">Drive</button>
+      <button class="tab" data-set="sheets" type="button" aria-pressed="false">Sheets</button>
+      <button class="tab" data-set="agency" type="button" aria-pressed="false">Agency</button>
+    </nav>
+    <div class="row toolbar-actions" aria-label="CRM actions">
+      <button class="btn primary" id="btnAdd" type="button" aria-expanded="false" aria-controls="addPanel">+ Add Google Sheet</button>
+      <button class="btn" id="btnSources" type="button" aria-expanded="false" aria-controls="srcPanel">Sources</button>
+      <button class="btn" id="btnStorage" type="button" aria-expanded="false" aria-controls="storagePanel">Storage</button>
+      <button class="btn" id="btnExport" type="button">Export JSON</button>
+    </div>
   </div>
 </header>
 
-<section class="panel" id="addPanel">
-  <strong>Add Google Sheet (paste link)</strong>
-  <div class="hint"><b>Koi bhi columns OK</b> (Name/Company zaroori nahi) — CRM headers sheet se khud banaega, extra fields invent nahi karega. Sheet ko <b>Anyone with the link → Viewer</b> share karke link paste karo. Drive Select grey rehna normal hai.</div>
-  <label>Name (optional)</label>
-  <input id="sheetName" placeholder="e.g. Dubai Fabric & Textile Leads"/>
-  <label>Google Sheet link (paste here)</label>
-  <input id="sheetUrl" inputmode="url" autocomplete="off" placeholder="https://docs.google.com/spreadsheets/d/..../edit"/>
-  <div class="row" style="margin-top:10px">
+<main class="workspace">
+<section class="panel" id="addPanel" aria-labelledby="addHeading">
+  <div class="panel-heading"><div><span class="section-kicker">Import leads</span><h2 id="addHeading">Add a Google Sheet</h2></div><p class="hint">Paste a public sheet link or import a CSV saved on this device.</p></div>
+  <p class="panel-intro"><b>Flexible columns:</b> company or name columns are optional. Headers are kept as provided, without inventing extra fields. Share the sheet as <b>Anyone with the link → Viewer</b>. Drive Select being unavailable is expected.</p>
+  <div class="form-grid">
+    <div><label for="sheetName">Source name <span class="hint">(optional)</span></label><input id="sheetName" placeholder="e.g. Dubai Fabric &amp; Textile Leads" autocomplete="off"/></div>
+    <div><label for="sheetUrl">Google Sheet link</label><input id="sheetUrl" inputmode="url" autocomplete="url" placeholder="https://docs.google.com/spreadsheets/d/…/edit"/></div>
+  </div>
+  <div class="row" style="margin-top:14px">
     <button class="btn good" id="btnFetch" type="button">Fetch &amp; save</button>
     <button class="btn" id="btnCloseAdd" type="button">Close</button>
   </div>
   <details>
-    <summary>Advanced: upload CSV file (not a Google Sheet)</summary>
-    <div class="hint">Sheet → File → Download → Comma-separated values (.csv), phir yahan choose karo.</div>
-    <input id="csvFile" type="file" accept=".csv,text/csv"/>
+    <summary>Advanced: upload a CSV file</summary>
+    <div class="hint">In Sheets, choose File → Download → Comma-separated values (.csv), then select the file here.</div>
+    <label class="sr-only" for="csvFile">Choose CSV file</label><input id="csvFile" type="file" accept=".csv,text/csv"/>
   </details>
-  <div class="msg" id="addMsg"></div>
+  <div class="msg" id="addMsg" role="status" aria-live="polite"></div>
 </section>
 
-<section class="panel" id="srcPanel">
-  <strong>Registered sources</strong>
+<section class="panel" id="srcPanel" aria-labelledby="sourcesHeading">
+  <div class="panel-heading"><div><span class="section-kicker">Connected data</span><h2 id="sourcesHeading">Registered sources</h2></div></div>
   <div id="srcList" class="hint">None yet</div>
   <button class="btn" id="btnCloseSrc" type="button" style="margin-top:8px">Close</button>
 </section>
 
-<section class="panel" id="storagePanel">
-  <strong>Multi-Drive storage</strong>
+<section class="panel" id="storagePanel" aria-labelledby="storageHeading">
+  <div class="panel-heading"><div><span class="section-kicker">Data location</span><h2 id="storageHeading">Multi-Drive storage</h2></div></div>
   <div class="hint" id="storageHint">Browser sirf cache hai · Real save = Google Drive via CEO BOT · Drive 1 full ho to Drive 2 attach.</div>
   <div id="storageActive" class="hint" style="margin-top:8px"></div>
   <div id="storageList"></div>
@@ -114,11 +166,12 @@ details summary{color:var(--muted);font-size:13px;cursor:pointer;margin-top:8px}
   </div>
 </section>
 
-<div class="searchwrap"><input id="q" type="search" placeholder="Search company, city, phone, email…" autocomplete="off"/></div>
-<div class="filters" id="filters"></div>
-<div class="stats" id="stats"></div>
-<div id="list"></div>
+<div class="searchwrap"><label class="sr-only" for="q">Search leads</label><div class="search-field"><svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none"><circle cx="10.8" cy="10.8" r="6.4" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.1 4.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><input id="q" type="search" placeholder="Search company, city, phone, email…" autocomplete="off"/></div></div>
+<div class="filters" id="filters" role="group" aria-label="Filter leads by category or status"></div>
+<div class="stats" id="stats" role="status" aria-live="polite" aria-atomic="true"></div>
+<div id="list" aria-label="Lead results"></div>
 <footer id="foot">Central CRM · mobile + Windows</footer>
+</main>
 
 <script>
 const STORE_KEY='central_crm_v3';
@@ -127,6 +180,18 @@ let BASE=null, EXTRA={sources:[],leads:[]}, SET='all', FILTER='all', Q='', STORA
 
 const $=s=>document.querySelector(s);
 function showMsg(el,type,text){ el.className='msg '+type; el.textContent=text; }
+function closePanels(){
+  [['#addPanel','#btnAdd'],['#srcPanel','#btnSources'],['#storagePanel','#btnStorage']].forEach(([panelId,buttonId])=>{
+    $(panelId).classList.remove('open'); $(buttonId).setAttribute('aria-expanded','false');
+  });
+}
+function openPanel(panelId,buttonId){ closePanels(); $(panelId).classList.add('open'); $(buttonId).setAttribute('aria-expanded','true'); }
+function setActiveView(view){
+  document.querySelectorAll('.tab').forEach(x=>{
+    const active=x.dataset.set===view;
+    x.classList.toggle('active',active); x.setAttribute('aria-pressed',String(active));
+  });
+}
 function sheetIdFromUrl(url){ const m=String(url||'').match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/); return m?m[1]:null; }
 function csvUrls(id){
   return [
@@ -252,8 +317,8 @@ function buildFilters(){
   allLeads().forEach(L=>{ const v=(L.category||L.status||'').trim(); if(v) vals.add(v); });
   const box=$('#filters'); box.innerHTML='';
   const mk=(label,val,on)=>{
-    const b=document.createElement('button'); b.type='button'; b.className='chip'+(on?' on':''); b.textContent=label;
-    b.onclick=()=>{ FILTER=val; [...box.children].forEach(c=>c.classList.remove('on')); b.classList.add('on'); render(); };
+    const b=document.createElement('button'); b.type='button'; b.className='chip'+(on?' on':''); b.textContent=label; b.setAttribute('aria-pressed',String(on));
+    b.onclick=()=>{ FILTER=val; [...box.children].forEach(c=>{c.classList.remove('on');c.setAttribute('aria-pressed','false');}); b.classList.add('on'); b.setAttribute('aria-pressed','true'); render(); };
     box.appendChild(b);
   };
   mk('All','all',FILTER==='all');
@@ -273,7 +338,7 @@ function render(){
     <div class="stat"><div class="l">With phone</div><div class="v">${rows.filter(L=>L.phone).length}</div></div>
     <div class="stat"><div class="l">With email</div><div class="v">${rows.filter(L=>L.email).length}</div></div>`;
   const list=$('#list'); list.innerHTML='';
-  if(!rows.length){ list.innerHTML='<div class="empty">No matches. Tap + Add Google Sheet and paste a public link.</div>'; return; }
+  if(!rows.length){ list.innerHTML='<div class="empty"><strong>No matching leads</strong><div class="hint">Try another search or filter, or add a Google Sheet to bring in more leads.</div></div>'; return; }
   rows.slice(0,500).forEach(L=>{
     const el=document.createElement('article'); el.className='card';
     const tel=phoneHref(L.phone);
@@ -292,15 +357,17 @@ function render(){
       ${L.notes?`<div class="meta" style="margin-top:6px">${esc(L.notes)}</div>`:''}
       ${L.fields?`<div class="meta" style="margin-top:6px">${Object.entries(L.fields).map(([k,v])=>`<div><b>${esc(k)}</b>: ${esc(v)}</div>`).join('')}</div>`:''}
       <div class="actions">
-        ${tel?`<a class="call" href="${tel}">Call</a>`:''}
-        ${mail?`<a class="mail" href="${mail}">Email</a>`:''}
-        ${web?`<a href="${web}" target="_blank" rel="noopener">Site</a>`:''}
+        ${tel?`<a class="call" href="${tel}" aria-label="Call ${esc(L.company||'lead')}">Call</a>`:''}
+        ${mail?`<a class="mail" href="${mail}" aria-label="Email ${esc(L.company||'lead')}">Email</a>`:''}
+        ${web?`<a href="${web}" target="_blank" rel="noopener" aria-label="Open website for ${esc(L.company||'lead')}">Site</a>`:''}
       </div>`;
     list.appendChild(el);
   });
   const nC=(BASE.central_leads||[]).length, nA=(BASE.agency_leads||[]).length, nS=(BASE.sheet_leads||[]).length+EXTRA.leads.length;
   $('#foot').textContent=`Drive ${nC} · Sheets ${nS} · Agency ${nA} · Device sources ${EXTRA.sources.length}`;
-  $('#subtitle').textContent=`Updated ${BASE.generated_at||''} · Paste sheet links (do not use Drive Select)`;
+  const stamp=BASE.generated_at?new Date(BASE.generated_at):null;
+  const updated=stamp&&!Number.isNaN(stamp.valueOf())?stamp.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'';
+  $('#subtitle').textContent=updated?`Updated ${updated}`:'Ready to review leads';
 }
 function statusBadge(st){
   const s=String(st||'');
@@ -367,7 +434,7 @@ async function addSheetFromUrl(){
     EXTRA.sources.unshift({id,name,url,status:'ok',records:leads.length,added_at:new Date().toISOString()});
     EXTRA.leads=EXTRA.leads.filter(L=>L.source_id!==id).concat(leads);
     saveExtra(); SET='sheets';
-    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.set==='sheets'));
+    setActiveView('sheets');
     buildFilters(); render(); renderSources();
     showMsg(msg,'ok', leads.length+' leads import + is device pe save.');
   }catch(e){
@@ -385,7 +452,7 @@ async function addSheetFromFile(file){
   EXTRA.sources.unshift({id,name,url:file.name,status:'csv_upload',records:leads.length,added_at:new Date().toISOString()});
   EXTRA.leads=EXTRA.leads.concat(leads);
   saveExtra(); SET='sheets';
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.set==='sheets'));
+    setActiveView('sheets');
   buildFilters(); render(); renderSources();
   showMsg(msg,'ok', leads.length+' leads CSV se save.');
 }
@@ -399,15 +466,15 @@ async function boot(){
     if(ad&&ad.label){ /* keep override if set */ }
   }
   document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
-    SET=t.dataset.set; document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t)); FILTER='all'; buildFilters(); render();
+    SET=t.dataset.set; setActiveView(SET); FILTER='all'; buildFilters(); render();
   });
   $('#q').oninput=e=>{ Q=e.target.value.trim().toLowerCase(); render(); };
-  $('#btnAdd').onclick=()=>{ $('#addPanel').classList.add('open'); $('#srcPanel').classList.remove('open'); $('#storagePanel').classList.remove('open'); };
-  $('#btnCloseAdd').onclick=()=>$('#addPanel').classList.remove('open');
-  $('#btnSources').onclick=()=>{ renderSources(); $('#srcPanel').classList.add('open'); $('#addPanel').classList.remove('open'); $('#storagePanel').classList.remove('open'); };
-  $('#btnCloseSrc').onclick=()=>$('#srcPanel').classList.remove('open');
-  $('#btnStorage').onclick=async()=>{ await loadStorage(); renderStorage(); $('#storagePanel').classList.add('open'); $('#addPanel').classList.remove('open'); $('#srcPanel').classList.remove('open'); };
-  $('#btnCloseStorage').onclick=()=>$('#storagePanel').classList.remove('open');
+  $('#btnAdd').onclick=()=>openPanel('#addPanel','#btnAdd');
+  $('#btnCloseAdd').onclick=closePanels;
+  $('#btnSources').onclick=()=>{ renderSources(); openPanel('#srcPanel','#btnSources'); };
+  $('#btnCloseSrc').onclick=closePanels;
+  $('#btnStorage').onclick=async()=>{ await loadStorage(); renderStorage(); openPanel('#storagePanel','#btnStorage'); };
+  $('#btnCloseStorage').onclick=closePanels;
   $('#btnFetch').onclick=addSheetFromUrl;
   $('#csvFile').onchange=e=>{ const f=e.target.files&&e.target.files[0]; if(f) addSheetFromFile(f); };
   $('#btnExport').onclick=()=>{
